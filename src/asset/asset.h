@@ -21,7 +21,7 @@ namespace asset {
 		}
 	};
 
-	int32_t load(void);
+	int32_t load(const char* headersPath, const char* contentPath);
 	void unload(void);
 
 	Asset get(const char* identifier);

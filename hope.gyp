@@ -12,7 +12,6 @@
         'src/entry/entry_sdl.cpp',
 
         'src/console_sdl.cpp',
-        
 
         'src/nvg.h',
         'src/nvg.cpp',
@@ -24,7 +23,9 @@
         'src/input/keyboard.cpp',
         
 
+        'src/asset/asset.h',
         'src/asset/asset.cpp',
+
         'src/core/core_sdl.cpp',
         'src/opengles2_wrapper.c',
 

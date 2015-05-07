@@ -85,8 +85,10 @@ extern C_LINKAGE int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-
-	::hope::asset::load();
+	if (::hope::asset::load("assets.headers.bin", "assets.content.bin") != 0) {
+		SDL_Log("Loading assets fail.");
+		return 1;
+	}
 
 	kApplciation->onInitialize();
 

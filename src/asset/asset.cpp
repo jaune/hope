@@ -53,15 +53,15 @@ namespace asset {
 		return buffer;
 	}
 
-	int32_t load() {
-		void* headers_buffer = loadFile("assets.headers.bin");
+	int32_t load(const char* headersPath, const char* contentPath) {
+		void* headers_buffer = loadFile(headersPath);
 		if (headers_buffer == NULL) {
 			return 45;
 		}
 
 		const ::hope::asset::fbs::Assets* assets = ::hope::asset::fbs::GetAssets(headers_buffer);
 
-		void* content_buffer = loadFile("assets.content.bin");
+		void* content_buffer = loadFile(contentPath);
 		if (content_buffer == NULL) {
 			return 46;
 		}
