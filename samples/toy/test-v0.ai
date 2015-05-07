@@ -1,0 +1,71 @@
+struct Location {
+	integer x;
+	integer y,
+};
+
+enum Direction {
+	TOP;
+	RIGHT;
+	BOTTOM;
+	LEFT;
+}
+
+enum Item {
+	STEEL_BEAM;
+	STEEL_PLATE;
+}
+
+type Quanity;
+type Recipe;
+
+struct Adjacent {
+	Location location;
+	Direction direction;
+}
+
+
+
+action GoTo(Location l);
+action GoToNearestAdjacent(Location l);
+action Construct(Location l, Recipe r);
+
+condition AdjacentTo(Location l, Direction d);
+condition At(Location l);
+
+---------
+
+
+step GoTo(Location to) {
+	postcondition At(to);
+
+	action GoTo(to);
+}
+
+step GoToNearestAdjacent(Location adjacentTo) {
+	postcondition AdjacentTo(adjacentTo);
+
+	action GoToNearestAdjacent(adjacentTo);
+}
+
+step Construct(Location l, Recipe r) {
+	precondition AdjacentTo(l);
+
+	action Construct(l, r);
+}
+
+
+
+-----------------
+
+initial {
+	At(Location(0, 0));
+}
+do Construct(Location(10, 10), WALL);
+
+--------------------
+
+
+
+
+
+  GoToNearestAdjacent(l<--) --> [ AdjacentTo(l<--) ] --> Construct(Location(10, 10), WALL);

@@ -1,0 +1,1 @@
+gyp .\nanovg.gyp --depth . --generator-output=./build

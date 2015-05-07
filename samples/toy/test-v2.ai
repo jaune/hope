@@ -1,0 +1,134 @@
+namespace hope::sample::toy::ai;
+
+need Sleep;
+need Drink;
+need Eat;
+need Lazy;
+
+
+alias hope::grid::Location Location;
+
+
+table Item {}
+
+item Item STEEL_BEAM {}
+item Item STEEL_PLATE {}
+
+
+table Resource {
+    effect[] effects;
+}
+
+item Resource WATER {
+    effects = [Drink(10)];
+}
+
+item Resource BREAD {
+    effects = [Eat(10)];
+}
+
+item Resource SOUP {
+    effects = [Drink(7), Eat(3)];
+}
+
+
+table Recipe {}
+
+item Recipe WALL {}
+item Recipe FLOOR {}
+
+
+action GoTo(Location l);
+action Construct(Location l, Recipe c);
+action GoToNearestAdjacent(Location l);
+action DropItem(Location l, Item i);
+action TakeItem(Location l, Item i);
+action HasDepositAt(Resource r, Location l);
+action Idle;
+
+condition AdjacentTo(Location l);
+condition At(Location l);
+condition HasItemQuantityAt(Item i, Quanity q, Location l)
+condition HasItemQuantity(Item i, Quanity q)
+
+
+step GoTo(Location to) {
+    precondition HasValidPathToAdjacentTo(to)
+	postcondition At(to);
+
+	action GoTo(to);
+}
+
+
+step GoToNearestAdjacent(Location adjacentTo) {
+	postcondition AdjacentTo(adjacentTo);
+    precondition HasValidPathToAdjacentTo(to)
+
+	step GoToNearestAdjacent(adjacentTo);
+}
+
+
+step TakeItem (Location l, Item i) {
+	precondition AdjacentTo(l);
+	precondition HasItemAt(i, l);
+
+	postcondition HasItem(i);
+
+	action TakeItem(l, i);
+}
+
+
+step DropItem(Location l, Item i) {
+	precondition AdjacentTo(l);
+	precondition HasItem(i, q);
+	
+	postcondition HasItemAt(i, l);
+
+	action DropItem(l, i);
+}
+
+
+step Construct(Location l, Recipe r) {
+	precondition AdjacentTo(l);
+    precondition HasRecipeItemsAt(r, l);
+
+	action Construct(l, r);
+}
+
+
+step Consume(Location l, Resource r) {
+    precondition AdjacentTo(l);
+    precondition HasDepositAt(r, l);
+
+    effect r.effects;
+    
+    action Consume(l, r);
+}
+
+
+step SleepOnGround {
+    effect Sleep(20);
+
+    action SleepOnGround;
+}
+
+
+step Idle {
+    effect Lazy(3);
+
+    action Idle;
+}
+
+-----------------
+
+initial {
+	At(Location(0, 0));
+}
+do Construct(Location(10, 10), WALL);
+
+--------------------
+
+                       [ HasItemQuantity(i<--, q<--) ] +
+GoToAdjacent(l<--) --> [ AdjacentTo(l<--, -->d)      ] +-> DropItem(l<--, i<--, q<--) --> [ HasItemQuantityAt(STEEL_BEAM, 3, l<--)  ] +1
+GoToAdjacent(l<--) --> [ AdjacentTo(l<--, -->d)      ] --> DropItem(l<--, i<--, q<--) --> [ HasItemQuantityAt(STEEL_PLATE, 2, l<--) ] +1
+                                                           GoToAdjacent(l<--)         --> [ AdjacentTo(l<--, -->d)                  ] +0-> ConstructWall(Location(10, 10))

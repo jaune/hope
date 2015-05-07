@@ -1,0 +1,21 @@
+include "TileType.fbs";
+
+namespace hope.samples.toy.fbs;
+
+table ConstructionRecipeItem {
+	quantity: short;
+	item_id: int;
+}
+
+table ConstructionRecipe {
+  id: int;
+  label: string;
+  labor: int;
+  items: [ConstructionRecipeItem];
+}
+
+table ConstructionRecipeTable {
+  recipes: [ConstructionRecipe];
+}
+
+root_type ConstructionRecipeTable;

@@ -1,0 +1,32 @@
+{
+	"items": [
+		{
+			"id": 849867,
+			"label": "Steel Plate",
+		},
+		{ 
+			"id": 728974,
+			"label": "Steel Beam"
+		},
+		{ 
+			"id": 987546,
+			"label": "Raw Carbon"
+		},
+		{ 
+			"id": 798265,
+			"label": "Raw Water"
+		},
+		{ 
+			"id": 952366,
+			"label": "Raw Iron"
+		},
+		{ 
+			"id": 9654,
+			"label": "Raw Aluminum"
+		},
+		{ 
+			"id": 982,
+			"label": "Raw Gold"
+		}
+	]
+}

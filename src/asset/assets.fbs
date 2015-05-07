@@ -1,0 +1,13 @@
+namespace hope.asset.fbs;
+
+table Asset {
+  identifier:string;
+  position: int;
+  size: int;
+}
+
+table Assets {
+  assets:[Asset];
+}
+
+root_type Assets;

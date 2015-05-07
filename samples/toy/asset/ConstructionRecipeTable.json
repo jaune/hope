@@ -1,0 +1,22 @@
+{
+	"recipes": [
+		{
+			"id": 353441,
+			"label": "Wall",
+			"labor": 3,
+			"items": [
+				{ "item_id": 849867, "quantity": 2 },
+				{ "item_id": 728974, "quantity": 3 }
+			]
+		},
+		{
+			"id": 574164,
+			"label": "Floor",
+			"labor": 3,
+			"items": [
+				{ "item_id": 849867, "quantity": 2 },
+				{ "item_id": 728974, "quantity": 2 }
+			]
+		}
+	]
+}

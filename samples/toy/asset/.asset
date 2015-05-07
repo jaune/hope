@@ -1,0 +1,20 @@
+{
+	"\\.png$": {
+		"transform": "webp-lossless"
+	},
+	"\\.tiles.json$": {
+		"transform": ["tile-indexes", "tile-indexes-binary"]
+	},
+	"ConstructionRecipeTable.json$": {
+		"transform": {
+			"type": "flatc",
+			"schema": "../src/ConstructionRecipeTable.fbs"
+		}
+	},
+	"ItemTable.json$": {
+		"transform": {
+			"type": "flatc",
+			"schema": "../src/ItemTable.fbs"
+		}
+	}
+}

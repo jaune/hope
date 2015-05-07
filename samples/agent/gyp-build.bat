@@ -1,0 +1,1 @@
+gyp .\agent.gyp --depth . --generator-output=./build

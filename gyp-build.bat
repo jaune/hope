@@ -1,0 +1,1 @@
+gyp .\hope.gyp --depth . --generator-output=./build

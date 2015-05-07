@@ -1,0 +1,18 @@
+namespace hope.samples.ui.fbs;
+
+table Storage_SetRequestCommand {
+  storage_id: int;
+  item_id: int;
+  request: int;
+}
+
+union Command { 
+	Storage_SetRequestCommand
+}
+
+table Message {
+	sender_id: int;
+	command: Command;
+}
+
+root_type Message;

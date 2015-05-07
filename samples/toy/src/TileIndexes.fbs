@@ -1,0 +1,35 @@
+include "TileType.fbs";
+
+namespace hope.samples.toy.fbs;
+
+
+table TileIndex8 {
+  index: byte;
+  center: TileType;
+
+  top: TileType;
+  topright: TileType;
+  right: TileType;
+  bottomright: TileType;
+  bottom: TileType;
+  bottomleft: TileType;
+  left: TileType;
+  topleft: TileType;
+}
+
+table TileIndex4 {
+  index: byte;
+  center: TileType;
+
+  top: TileType;
+  right: TileType;
+  bottom: TileType;
+  left: TileType;
+}
+
+table TileIndexes {
+  indexes4:[TileIndex4];
+  indexes8:[TileIndex8];
+}
+
+root_type TileIndexes;

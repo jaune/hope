@@ -1,0 +1,6 @@
+enum TileType : byte {
+  VOID = 0,
+  WALL,
+  FLOOR,
+  DOOR  
+}

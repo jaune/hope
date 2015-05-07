@@ -1,0 +1,921 @@
+{
+  "tiles": {
+    "0,6": {
+      "x": 0,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "1,6": {
+      "x": 1,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "2,6": {
+      "x": 2,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "3,6": {
+      "x": 3,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "4,6": {
+      "x": 4,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "VOID"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "5,6": {
+      "x": 5,
+      "y": 6,
+      "type": "WALL",
+      "top": [],
+      "topright": [],
+      "right": [],
+      "bottomright": [],
+      "bottom": [],
+      "bottomleft": [],
+      "left": [],
+      "topleft": []
+    },
+    "6,6": {
+      "x": 6,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "5,7": {
+      "x": 5,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": []
+    },
+    "6,7": {
+      "x": 6,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "0,7": {
+      "x": 0,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "1,7": {
+      "x": 1,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "2,7": {
+      "x": 2,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "3,7": {
+      "x": 3,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "4,7": {
+      "x": 4,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "7,6": {
+      "x": 7,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "8,6": {
+      "x": 8,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "7,7": {
+      "x": 7,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "8,7": {
+      "x": 8,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "9,6": {
+      "x": 9,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "0,8": {
+      "x": 0,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "1,8": {
+      "x": 1,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "2,8": {
+      "x": 2,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "3,8": {
+      "x": 3,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "4,8": {
+      "x": 4,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "5,8": {
+      "x": 5,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "6,8": {
+      "x": 6,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "WALL"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "7,8": {
+      "x": 7,
+      "y": 8,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "8,8": {
+      "x": 8,
+      "y": 8,
+      "type": "",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "FLOOR"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "9,7": {
+      "x": 9,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "FLOOR"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "10,7": {
+      "x": 10,
+      "y": 7,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "WALL"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "FLOOR"
+      ]
+    },
+    "10,6": {
+      "x": 10,
+      "y": 6,
+      "type": "FLOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [
+        "WALL"
+      ],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [
+        "WALL"
+      ],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [
+        "FLOOR"
+      ],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": [
+        "WALL"
+      ]
+    },
+    "3,1": {
+      "x": 3,
+      "y": 1,
+      "type": "DOOR",
+      "top": [
+        "WALL"
+      ],
+      "topright": [],
+      "right": [
+        "FLOOR"
+      ],
+      "bottomright": [],
+      "bottom": [
+        "WALL"
+      ],
+      "bottomleft": [],
+      "left": [
+        "FLOOR"
+      ],
+      "topleft": []
+    },
+    "5,1": {
+      "x": 5,
+      "y": 1,
+      "type": "DOOR",
+      "top": [
+        "FLOOR"
+      ],
+      "topright": [],
+      "right": [
+        "WALL"
+      ],
+      "bottomright": [],
+      "bottom": [
+        "FLOOR"
+      ],
+      "bottomleft": [],
+      "left": [
+        "WALL"
+      ],
+      "topleft": []
+    }
+  }
+}

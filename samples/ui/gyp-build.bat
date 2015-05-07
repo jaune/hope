@@ -1,0 +1,1 @@
+gyp .\ui.gyp --depth . --generator-output=./build

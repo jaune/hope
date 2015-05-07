@@ -1,0 +1,1 @@
+gyp .\destroy.gyp --depth . --generator-output=./build

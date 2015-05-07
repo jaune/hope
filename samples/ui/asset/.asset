@@ -1,0 +1,11 @@
+{
+	"\\.png$": {
+		"transform": "webp-lossless"
+	},
+	"ItemTable.json$": {
+		"transform": {
+			"type": "flatc",
+			"schema": "../src/ItemTable.fbs"
+		}
+	}
+}

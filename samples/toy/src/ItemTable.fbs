@@ -1,0 +1,12 @@
+namespace hope.samples.toy.fbs;
+
+table Item {
+  id: int;
+  label: string;
+}
+
+table ItemTable {
+  items: [Item];
+}
+
+root_type ItemTable;

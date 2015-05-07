@@ -1,0 +1,1 @@
+gyp .\tile.gyp --depth . --generator-output=./build
