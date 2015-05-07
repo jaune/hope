@@ -89,73 +89,63 @@ std::thread* worker;
 
 hope::core::Tick kAccu = 0;
 
-class Worker {
+
+void worker_onMessage(const hope::samples::ui::fbs::Message* message) {
+	hope::console::log("==> %s", hope::samples::ui::fbs::EnumNameCommand(message->command_type()));
+}
+
+void worker_process(){
 	bool is_running = true;
 	int sock = -1;
 
-public:
-	void onMessage(const hope::samples::ui::fbs::Message* message) {
-		hope::console::log("==> %s", hope::samples::ui::fbs::EnumNameCommand(message->command_type()));
-	}
+	sock = nn_socket(AF_SP, NN_PAIR);
+	assert(sock >= 0);
+	assert(nn_connect(sock, "inproc://test") >= 0);
 
-	void process(){
-		sock = nn_socket(AF_SP, NN_PAIR);
-		assert(sock >= 0);
-		assert(nn_connect(sock, "inproc://test") >= 0);
+	hope::console::log("worker_process: %d", sock);
 
-		hope::console::log("worker_process: %d", sock);
-			
-		int rc;
-		struct nn_pollfd pfd[1];
+	int rc;
+	struct nn_pollfd pfd[1];
 
-		pfd[0].fd = sock;
-		pfd[0].events = NN_POLLIN | NN_POLLOUT;
+	pfd[0].fd = sock;
+	pfd[0].events = NN_POLLIN | NN_POLLOUT;
 
-		int nbytes;
-		int16_t msg_size;
-		uint8_t msg_buffer[512];
+	int nbytes;
+	int16_t msg_size;
+	uint8_t msg_buffer[512];
 
-		while (is_running) {
-			rc = nn_poll(pfd, 1, 200);
-			if (rc == 0) {
-				hope::console::log("worker_process: %d TIMEOUT", sock);
-			}
-			else if (rc == -1) {
-				hope::console::log("worker_process: %d ERROR", sock);
+	while (is_running) {
+		rc = nn_poll(pfd, 1, 200);
+		if (rc == 0) {
+			hope::console::log("worker_process: %d TIMEOUT", sock);
+		}
+		else if (rc == -1) {
+			hope::console::log("worker_process: %d ERROR", sock);
+			is_running = false;
+		}
+		else if (pfd[0].revents & NN_POLLIN) {
+			nbytes = nn_recv(sock, &msg_size, sizeof(msg_size), 0);
+			if (nbytes != sizeof(msg_size)) {
+				hope::console::log("worker_process: %d ERROR SIZE %d / %d", sock, nbytes, sizeof(msg_size));
 				is_running = false;
 			}
-			else if (pfd[0].revents & NN_POLLIN) {
-				nbytes = nn_recv(sock, &msg_size, sizeof(msg_size), 0);
-				if (nbytes != sizeof(msg_size)) {
-					hope::console::log("worker_process: %d ERROR SIZE %d / %d", sock, nbytes, sizeof(msg_size));
+			else {
+				if (msg_size == -1) { // EXIT THREAD
 					is_running = false;
 				}
 				else {
-					if (msg_size == -1) { // EXIT THREAD
-						is_running = false;
+					nbytes = nn_recv(sock, msg_buffer, msg_size, 0);
+					if (nbytes != msg_size) {
+						hope::console::log("worker_process: %d ERROR MSG %d / %d", sock, nbytes, msg_size);
 					}
 					else {
-						nbytes = nn_recv(sock, msg_buffer, msg_size, 0);
-						if (nbytes != msg_size) {
-							hope::console::log("worker_process: %d ERROR MSG %d / %d", sock, nbytes, msg_size);
-						}
-						else {
-							onMessage(hope::samples::ui::fbs::GetMessage(msg_buffer));
-						}
-					}					
+						worker_onMessage(hope::samples::ui::fbs::GetMessage(msg_buffer));
+					}
 				}
 			}
 		}
-		assert(nn_close(sock) == 0);
 	}
-};
-
-
-
-void worker_process(){
-	Worker worker;
-
-	worker.process();
+	assert(nn_close(sock) == 0);
 }
 
 #include "./ui/StorageList.h"

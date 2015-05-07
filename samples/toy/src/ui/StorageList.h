@@ -24,8 +24,9 @@ namespace ui {
 		static void render(Canvas* c, ElementId root, const Props& props) {
 			Style& style = c->getElement(root).style;
 
-			style.width = Size::pc(0.33f);
-			style.height = Size::pc(1.0f);
+// ?????
+//			style.width = Size::pc(0.33f);
+//			style.height = Size::pc(1.0f);
 			style.layout.type = Layout::VERTICAL;
 
 			{
@@ -73,10 +74,13 @@ namespace ui {
 
 				StorageListItem::Props sli_p;
 
+				sli_p.item_id = it->id();
+				sli_p.storage_id = props.storage_id;
 				sli_p.label = it->label()->c_str();
 				sli_p.quantity = items.getItemQuantity(it->id());
 				sli_p.request_quantity = requests.getItemQuantity(it->id());
-				sli_p.onRequestQuantityChange = std::bind(onRequestQuantityChange, c, root, it->id(), std::placeholders::_1);
+				
+				//sli_p.onRequestQuantityChange = std::bind(onRequestQuantityChange, c, root, it->id(), std::placeholders::_1);
 
 				c->appendChild<StorageListItem>(root, sli_p);
 
@@ -85,14 +89,6 @@ namespace ui {
 		}
 
 		
-		static void onRequestQuantityChange(Canvas* c, ElementId id, ItemId item_id, float value) {
-			const Props& props = c->getProps<StorageList>(id);
-
-			hope::console::log(" --- setItemQuantity(%d, %f) --- ", item_id, value);
-
-			auto sc = Components::get<StorageComponent>(props.storage_id);
-			sc->request_quantities.setItemQuantity(item_id, value);
-		}
 
 		static void onClick(Canvas* c, ElementId id, const event::Click::Event& e) {
 			hope::console::log(" --- Click --- %d ", id);

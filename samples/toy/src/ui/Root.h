@@ -1,22 +1,24 @@
-#ifndef HOPE_SAMPLES_UI_UI_StorageListItem_H
-#define HOPE_SAMPLES_UI_UI_StorageListItem_H
+#ifndef HOPE_SAMPLES_UI_UI_Root_H
+#define HOPE_SAMPLES_UI_UI_Root_H
 
 #include "./Canvas.h"
 
 #include "./InputNumber.h"
-#include "../command/Command.h"
+
+
 
 namespace ui {
 	using namespace hope::ui;
 
-	struct StorageListItem {
+	struct Root {
+
+		// state
 
 		struct Props {
-			EntityId storage_id;
-			ItemId item_id;
-			const char* label;
+			std::string label;
 			float quantity;
 			float request_quantity;
+			std::function<void(float)> onRequestQuantityChange;
 		};
 
 		static void render(Canvas* c, ElementId root, const Props& props) {
@@ -57,7 +59,7 @@ namespace ui {
 				rq_p.maxValue = 1000;
 				rq_p.step = 10;
 				rq_p.value = props.request_quantity;
-				rq_p.onChange = c->bindCallback<int16_t>(root, onRequestQuantityChange);
+				rq_p.onChange = props.onRequestQuantityChange;
 
 				auto rq = c->appendChild< InputNumber<ItemQuantity> >(root, rq_p);
 
@@ -68,20 +70,13 @@ namespace ui {
 			}
 		}
 
-		static void onRequestQuantityChange(Canvas* c, ElementId id, int16_t value) {
-			const Props& props = c->getProps<StorageListItem>(id);
 
-			command::StorageSetItemRequestQuantity command;
 
-			command.storage_id = props.storage_id;
-			command.item_id = props.item_id;
-			command.quantity = value;
-
-			command::trigger(command);
-		}
+		typedef std::unordered_map<ElementGid, Props> PropsMap;
+		static PropsMap props;
 	};
-
+	Root::PropsMap Root::props;
 
 }
 
-#endif /* HOPE_SAMPLES_UI_UI_StorageListItem_H */
+#endif /* HOPE_SAMPLES_UI_UI_Root_H */

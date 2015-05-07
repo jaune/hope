@@ -48,6 +48,7 @@
 #include "./ui/StorageList.h"
 
 hope::ui::Canvas uiCanvas(1);
+bool uiNeededRender = true;
 
 
 ComponentManager<GoToComponent> Components::manager_GoToComponent;
@@ -178,9 +179,9 @@ void wallConstructionCallback(int32_t x, int32_t y)  {
 
 class RoomFloodFillCallback : public hope::grid::FloodFillQuery::Callback {
 public:
-	bool isOpen(int32_t x, int32_t y) const {
-		return TheGrid::kToyGrid->at(x, y)->type == FLOOR;
-	}
+bool isOpen(int32_t x, int32_t y) const {
+return TheGrid::kToyGrid->at(x, y)->type == FLOOR;
+}
 };
 
 
@@ -188,72 +189,72 @@ public:
 static std::vector<Room*> kRooms;
 
 struct ApplyRoomCallback : hope::grid::Callback {
-	RoomCell room;
+RoomCell room;
 
-	void iterateCell(int32_t x, int32_t y)  const {
-		const Room* oldRoom = TheGrid::kRoomGrid->get(x, y).room;
+void iterateCell(int32_t x, int32_t y)  const {
+const Room* oldRoom = TheGrid::kRoomGrid->get(x, y).room;
 
-		TheGrid::kRoomGrid->set(x, y, room);
-		if (room.room != NULL) {
-			room.room->airtight &= (TheGrid::kToyGrid->at(x + 1, y)->type != VOID)
-				&& (TheGrid::kToyGrid->at(x - 1, y)->type != VOID)
-				&& (TheGrid::kToyGrid->at(x, y + 1)->type != VOID)
-				&& (TheGrid::kToyGrid->at(x, y - 1)->type != VOID);
-			room.room->cell_count++;
-		}
-	}
+TheGrid::kRoomGrid->set(x, y, room);
+if (room.room != NULL) {
+room.room->airtight &= (TheGrid::kToyGrid->at(x + 1, y)->type != VOID)
+&& (TheGrid::kToyGrid->at(x - 1, y)->type != VOID)
+&& (TheGrid::kToyGrid->at(x, y + 1)->type != VOID)
+&& (TheGrid::kToyGrid->at(x, y - 1)->type != VOID);
+room.room->cell_count++;
+}
+}
 
 };
 
 Room* findRoom(const hope::grid::Location& location) {
-	const RoomGrid::Cell& cell = TheGrid::kRoomGrid->get(location);
+const RoomGrid::Cell& cell = TheGrid::kRoomGrid->get(location);
 
-	return cell.room;
+return cell.room;
 }
 
 void updateRooms() {
-	ApplyRoomCallback cb;
-	RoomFloodFillCallback ffcb;
+ApplyRoomCallback cb;
+RoomFloodFillCallback ffcb;
 
-	for (auto it = kRooms.begin(); it != kRooms.end(); ++it) {
-		delete (*it);
-	}
+for (auto it = kRooms.begin(); it != kRooms.end(); ++it) {
+delete (*it);
+}
 
-	kRooms.clear();
+kRooms.clear();
 
-	hope::grid::FloodFillQuery query(TheGrid::kGrid->width, TheGrid::kGrid->height, ffcb);
+hope::grid::FloodFillQuery query(TheGrid::kGrid->width, TheGrid::kGrid->height, ffcb);
 
-	std::vector<Room*> newRooms;
+std::vector<Room*> newRooms;
 
-	bool test = true;
-	while (test) {
-		cb.room.room = new Room();
-		cb.room.room->cell_count = 0;
-		cb.room.room->airtight = true;
-		cb.room.room->o2 = 0;
+bool test = true;
+while (test) {
+cb.room.room = new Room();
+cb.room.room->cell_count = 0;
+cb.room.room->airtight = true;
+cb.room.room->o2 = 0;
 
-		test = query.findFirstUnvisitedArea(cb);
-		if (!test) {
-			delete cb.room.room;
-		}
-		else {
-			if (cb.room.room->airtight) {
-				cb.room.room->o2 = 33 * cb.room.room->cell_count;
-			}
-			kRooms.push_back(cb.room.room);
-		}
-	}
+test = query.findFirstUnvisitedArea(cb);
+if (!test) {
+delete cb.room.room;
+}
+else {
+if (cb.room.room->airtight) {
+cb.room.room->o2 = 33 * cb.room.room->cell_count;
+}
+kRooms.push_back(cb.room.room);
+}
+}
 }
 
 
 struct ApplyVoidCallback : hope::grid::Callback {
 
-	void iterateCell(int32_t x, int32_t y) const {
-		RoomCell* cell = TheGrid::kRoomGrid->find(x, y);
-		if (cell != NULL){
-			cell->room->o2 = 0;
-		}
-	}
+void iterateCell(int32_t x, int32_t y) const {
+RoomCell* cell = TheGrid::kRoomGrid->find(x, y);
+if (cell != NULL){
+cell->room->o2 = 0;
+}
+}
 
 };
 */
@@ -261,18 +262,18 @@ struct ApplyVoidCallback : hope::grid::Callback {
 /*
 class VoidFloodFillCallback : public hope::grid::FloodFillQuery::Callback {
 public:
-	bool isOpen(int32_t x, int32_t y) const {
-		return TheGrid::kGrid->isOpen(x, y);
-	}
+bool isOpen(int32_t x, int32_t y) const {
+return TheGrid::kGrid->isOpen(x, y);
+}
 };
 
 
 void updateVoid() {
-	ApplyVoidCallback cb;
-	VoidFloodFillCallback ffcb;
+ApplyVoidCallback cb;
+VoidFloodFillCallback ffcb;
 
-	hope::grid::FloodFillQuery query(TheGrid::kGrid->width, TheGrid::kGrid->height, ffcb);
-	query.queryFloodFill(0, 0, cb);
+hope::grid::FloodFillQuery query(TheGrid::kGrid->width, TheGrid::kGrid->height, ffcb);
+query.queryFloodFill(0, 0, cb);
 }
 */
 
@@ -305,16 +306,16 @@ void Application::BeginRoomConstructionCommand::execute() {
 
 void initializeGrid() {
 	systems::TheGrid()->initialize(100, 100);
-	
+
 	systems::task::Construction.initialize(100, 100);
-	
+
 
 	ItemCell item;
 
 	item.items.setItemQuantity(849867, 10);
 
 	systems::TheGrid()->kItemGrid->set(34, 53, item);
-	
+
 	systems::TheGrid()->setRoom(15, 15, 25, 25);
 	systems::TheGrid()->setRoom(5, 5, 20, 20);
 
@@ -328,11 +329,11 @@ void initializeGrid() {
 	systems::TheGrid()->setDoor(24, 18, false, true);
 	systems::TheGrid()->setDoor(39, 34, false, false);
 	systems::TheGrid()->setDoor(48, 34, false, false);
-	
-	
+
+
 	systems::TheGrid()->setWall(99, 99);
 	systems::TheGrid()->setWall(49, 49);
-	
+
 	// FloorConstructionCallback fcb;
 	// WallConstructionCallback scb;
 
@@ -348,10 +349,11 @@ void initializeGrid() {
 
 	systems::TheGrid()->kToyGrid->queryFillRect(10, 43, 1, 1, &floorConstructionCallback);
 
-//	updateRooms();
+	//	updateRooms();
 }
 
-
+EntityId gStorageId = 0;
+hope::asset::Asset asset_ItemTable;
 
 void initializeEntities() {
 
@@ -382,18 +384,9 @@ void initializeEntities() {
 		requests.setItemQuantity(9654, 500); // "Raw Aluminum"
 		requests.setItemQuantity(982, 500); // "Raw Gold"
 
-		
-		
-		ui::StorageList::Props sl_p;
-		sl_p.storage_id = id;
-		hope::asset::Asset asset_ItemTable = hope::asset::get("ItemTable.json(flatc)");
-		sl_p.table = hope::samples::toy::fbs::GetItemTable(asset_ItemTable.pointer);
+		gStorageId = id;
 
-		// hope::core::Tick begin = hope::core::getTicks();
 
-		hope::ui::ElementId e = uiCanvas.appendChildToRoot<ui::StorageList>(sl_p);
-
-		// hope::console::log("appendChildToRoot %dms ", hope::core::getTicks() - begin);
 	}
 
 	{
@@ -415,7 +408,7 @@ void initializeEntities() {
 	{
 		EntityId id = factories::agent::create("Guillaume", hope::grid::Location(19, 19));
 
-		/*	
+		/*
 		Components::attach<ActionComponent>(id);
 		auto g = Components::attach<GoToAdjacentActionComponent>(id);
 
@@ -425,19 +418,32 @@ void initializeEntities() {
 
 }
 
-hope::grid::PathFinder* gPathFinder = NULL;
+// hope::grid::PathFinder* gPathFinder = NULL;
+
+void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQuantity& command){
+	
+	auto sc = Components::get<StorageComponent>(
+		command.storage_id);
+
+	sc->request_quantities.setItemQuantity(
+		command.item_id,
+		command.quantity);
+
+	uiNeededRender = true;
+}
 
 void Application::onInitialize(void) {
 
 	hope::asset::Asset asset_ConstructionRecipeTable = hope::asset::get("ConstructionRecipeTable.json(flatc)");
 	systems::task::Construction.loadConstructionRecipeTable(asset_ConstructionRecipeTable);
 
-	hope::asset::Asset asset_ItemTable = hope::asset::get("ItemTable.json(flatc)");
+	asset_ItemTable = hope::asset::get("ItemTable.json(flatc)");
 	const hope::samples::toy::fbs::ItemTable* table_ItemTable = hope::samples::toy::fbs::GetItemTable(asset_ItemTable.pointer);
 
 	for (auto it = table_ItemTable->items()->begin(); it != table_ItemTable->items()->end(); ++it) {
 		kItemTable.insert(ItemTable::value_type(it->id(), *it));
 	}
+
 
 
 	defaultMapping.bind(hope::input::keyboard::KEY_Q, this->createCommad<BeginWallConstructionCommand>());
@@ -447,66 +453,65 @@ void Application::onInitialize(void) {
 
 	hope::input::keyboard::enableMapping(&defaultMapping);
 
+
+	command::createMapping();
+	command::bind<command::StorageSetItemRequestQuantity>(command_StorageSetItemRequestQuantity);
+
+
 	initializeGrid();
 
-
-
-	
 	kTileIndexTable.initializeFromAssets(hope::asset::get("tiles.indexes.bin"));
-
 
 	initializeEntities();
 
-//	initializePlanDefinitionNetwork(systems::Task.kPlanNetwork);
+	//	initializePlanDefinitionNetwork(systems::Task.kPlanNetwork);
 
-	
+
 	// hope::grid::Location begin(10, 43);
 	// hope::grid::Location end(20, 20);
 
-		hope::grid::Location begin(20, 20);
-		hope::grid::Location end(10, 43);
-/*
-	{
+	hope::grid::Location begin(20, 20);
+	hope::grid::Location end(10, 43);
+	/*
+		{
 		auto beginTicks = hope::core::getTicks();
 		for (int i = 0; i < 10; i++) {
-			hope::grid::PathFinder pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
-			pf.find(begin, end);
+		hope::grid::PathFinder pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
+		pf.find(begin, end);
 		}
 		hope::console::log("PathFinder::find x 10 : %d", hope::core::getTicks() - beginTicks);
-	}
+		}
 
-	{
+		{
 		auto beginTicks = hope::core::getTicks();
 		for (int i = 0; i < 10; i++) {
-			hope::grid::PathFinder_blob_v1 pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
-			pf.find(begin, end);
+		hope::grid::PathFinder_blob_v1 pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
+		pf.find(begin, end);
 		}
 		hope::console::log("PathFinder_blob_v1::find x 10 : %d", hope::core::getTicks() - beginTicks);
-	}
+		}
 
-	{
+		{
 		auto beginTicks = hope::core::getTicks();
 		for (int i = 0; i < 10; i++) {
-			hope::grid::PathFinder_blob_v2 pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
-			pf.find(begin, end);
+		hope::grid::PathFinder_blob_v2 pf(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
+		pf.find(begin, end);
 		}
 		hope::console::log("PathFinder_blob_v2::find x 10 : %d", hope::core::getTicks() - beginTicks);
-	}
-	
-	exit(45);
-	
-	*/
-	gPathFinder = new hope::grid::PathFinder(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
-	gPathFinder->find(begin, end);
+		}
+
+		exit(45);
+
+		*/
+	// gPathFinder = new hope::grid::PathFinder(systems::TheGrid()->bounds, systems::TheGrid()->isCellOpenCallback);
+	//	gPathFinder->find(begin, end);
 
 
 	int32_t winWidth = 1024, winHeight = 768;
+
 	hope::core::getViewportSize(&winWidth, &winHeight);
+	uiCanvas.setSize(winWidth, winHeight);
 
-	uiCanvas.setRootSize(winWidth, winHeight);
-
-
-	
 }
 
 
@@ -526,20 +531,20 @@ void applyMouseMode(MouseMode mode, const hope::grid::AABox& box) {
 	case MOUSE_MODE_ROOM: {
 
 		systems::TheGrid()->kToyGrid->queryRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, 1, floorConstructionCallback, wallConstructionCallback);
-//		updateRooms();
-//		updateVoid();
+		//		updateRooms();
+		//		updateVoid();
 		break;
 	}
 
 	case MOUSE_MODE_WALL: {
-		
+
 
 		systems::TheGrid()->kToyGrid->queryFillRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, wallConstructionCallback);
 
 		// TheGrid::kTaskPool->sortHeadersByLevelAndPriority();
 
-//		updateRooms();
-//		updateVoid();
+		//		updateRooms();
+		//		updateVoid();
 		break;
 	}
 	case MOUSE_MODE_FLOOR: {
@@ -548,8 +553,8 @@ void applyMouseMode(MouseMode mode, const hope::grid::AABox& box) {
 
 		// TheGrid::kTaskPool->sortHeadersByLevelAndPriority();
 
-//		updateRooms();
-//		updateVoid();
+		//		updateRooms();
+		//		updateVoid();
 
 		break;
 	}
@@ -557,8 +562,8 @@ void applyMouseMode(MouseMode mode, const hope::grid::AABox& box) {
 
 		systems::TheGrid()->kToyGrid->queryFillRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, cancelConstructionCallback);
 
-//		updateRooms();
-//		updateVoid();
+		//		updateRooms();
+		//		updateVoid();
 
 		break;
 	}
@@ -575,7 +580,7 @@ void DepositComponent_foreach_updateRenderer(TileRenderer& gridRenderer, Deposit
 	uint8_t tileIndex;
 
 	switch (component->item_id) {
-	
+
 	case 798265: { // Raw Water
 		tileIndex = (0 * 16) + 12;
 		break;
@@ -740,6 +745,8 @@ void Application::updateRenderer() {
 	std::function <void(DepositComponent*, EntityId)> f3 = std::bind(DepositComponent_foreach_updateRenderer, gridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<DepositComponent>(f3);
 
+
+
 	gridRenderer.commit();
 }
 
@@ -886,7 +893,7 @@ void TaskComponent_stackTask(TaskComponent* c, EntityId id) {
 	if (c->childrenTotal > 0) {
 		nvgStackText("   children: %d / %d", c->childrenDone, c->childrenTotal);
 	}
-	
+
 
 	auto ata = Components::find<AttachToAgentComponent>(id);
 	if (ata != NULL) {
@@ -934,10 +941,8 @@ void Application::onLoop(void) {
 	kUIAccuTime += elaspsedTime;
 
 	bool scrollNotified = false;
-
+	
 	// ---------------------------- INPUT UI
-
-	uiCanvas.updateElementBox();
 
 	if (mouseState.scroll.deltaX != 0 || mouseState.scroll.deltaY != 0)
 	{
@@ -949,19 +954,57 @@ void Application::onLoop(void) {
 		scrollNotified = uiCanvas.notify<hope::ui::event::Scroll>(mouseState.x, mouseState.y, e);
 	}
 
-	if (mouseState.buttons[hope::input::mouse::BOUTON_LEFT].just_up
-		|| mouseState.buttons[hope::input::mouse::BOUTON_MIDDLE].just_up
-		|| mouseState.buttons[hope::input::mouse::BOUTON_RIGHT].just_up)
-	{
-		hope::ui::event::Click::Event e;
+	for (size_t i = 0; i < 256; ++i) {
+		if (mouseState.buttons[i].just_up)
+		{
+			hope::ui::event::Click::Event e;
+			e.x = mouseState.x;
+			e.y = mouseState.y;
+			uiCanvas.notify<hope::ui::event::Click>(mouseState.x, mouseState.y, e);
+		}
+		if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::START)
+		{
+			hope::ui::event::DragStart::Event e;
 
-		e.x = mouseState.x;
-		e.y = mouseState.y;
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
 
-		uiCanvas.notify<hope::ui::event::Click>(mouseState.x, mouseState.y, e);
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			uiCanvas.notify<hope::ui::event::DragStart>(mouseState.x, mouseState.y, e);
+		}
+		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::END)
+		{
+			hope::ui::event::DragEnd::Event e;
+
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
+
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			uiCanvas.notify<hope::ui::event::DragEnd>(e.startX, e.startY, e);
+		}
+		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::MOVE)
+		{
+			hope::ui::event::DragMove::Event e;
+
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
+
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			uiCanvas.notify<hope::ui::event::DragMove>(e.startX, e.startY, e);
+		}
 	}
 
+
+	
+
 	// ---------------------------- INPUT UI
+
 
 	// -------------------------- INPUT
 
@@ -1016,13 +1059,16 @@ void Application::onLoop(void) {
 
 	// -------------------------- INPUT
 
-
+	command::dispatch();
+	
 	// -------------------------- UPDATE WORLD
+	
+
 	while (kAccuTime > 30) {
 		//		updateAgentAliveGauges(store_Alive.pool, store_Alive.pool_cursor);
 		//		updateAgentAliveNeeds(store_Alive.pool, store_Alive.pool_cursor);
 		//		updateAgentAliveAction(store_Alive.pool, store_Alive.pool_cursor);
-		
+
 		systems::Task.updatePlans();
 
 		systems::Action::cleanup();
@@ -1033,23 +1079,35 @@ void Application::onLoop(void) {
 
 		systems::Action::process();
 
-		
-
 		kAccuTime = 0;
 	}
 	// -------------------------- UPDATE WORLD
+
+
+	if (uiNeededRender) {
+		ui::StorageList::Props sl_p;
+		sl_p.storage_id = gStorageId;
+		sl_p.table = hope::samples::toy::fbs::GetItemTable(asset_ItemTable.pointer);
+
+		uiCanvas.render<ui::StorageList>(sl_p);
+		uiNeededRender = false;
+	}
+
+
+
+
 
 	// -------------------------- UPDATE GRID
 	updateRenderer();
 	// -------------------------- UPDATE GRID
 
-	
+
 	// ---------------------------- DRAW
 
-	if (kUIAccuTime > 100) {
+//	if (kUIAccuTime > 100) {
 		drawUI();
 		kUIAccuTime = 0;
-	}
+//	}
 
 	glViewport(0, 0, winWidth, winHeight);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -1058,11 +1116,11 @@ void Application::onLoop(void) {
 	gridRenderer.render();
 
 	framebuffer.render();
-	
-	
-	
-	
-		
+
+
+
+
+
 	// ---------------------------- DRAW
 }
 
@@ -1086,10 +1144,8 @@ void Application::drawUI() {
 
 		auto vg = ::hope::nanovg::getContext();
 
-		uiCanvas.drawElementBox(vg);
 
 		uiCanvas.draw(vg);
-
 
 
 		//	nvgDrawAABB(aabb);
@@ -1104,6 +1160,13 @@ void Application::drawUI() {
 			//		nvgStackText("nodes: %d", gPathFinder->nodes.size());
 
 			nvgStackText("%d;%d", mouseLocation.x, mouseLocation.y);
+
+			nvgStackText("drag left %d (%d; %d)",
+				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.status,
+				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaX,
+				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaY
+			);
+			
 
 			nvgStackText("=============");
 
@@ -1160,7 +1223,7 @@ void Application::drawUI() {
 	::hope::nanovg::endFrame();
 	framebuffer.end();
 
-	
+
 }
 
 
@@ -1169,7 +1232,7 @@ void Application::onResize(int width, int height) {
 	glViewport(0, 0, width, height);
 
 	gridRenderer.resize(width, height);
-	uiCanvas.setRootSize(width, height);
+	uiCanvas.setSize(width, height);
 }
 
 
@@ -1194,9 +1257,6 @@ void Application::onGLInitialize() {
 	//		gridRenderer.set(it->second.x, it->second.y, toTileIndex(it->second));
 	//	}
 	//	gridRenderer.commit();
-
-
-	
 }
 
 void Application::onGLRelease(void) {

@@ -4,59 +4,92 @@ namespace hope {
 namespace input {
 namespace mouse {
 
-static MouseState kState;
-static bool kFirstUpdate = true;
+MouseState gState;
+MouseState gLastState;
+bool gFirstUpdate = true;
+
 
 void getPosition(int32_t *x, int32_t *y) {
-	*x = kState.x;
-	*y = kState.y;
+	*x = gState.x;
+	*y = gState.y;
 }
 
 const MouseState& getMouseState() {
-	return kState;
+	return gState;
 }
 
 void beginUpdateState() {
-	if (kFirstUpdate) {
-		kFirstUpdate = false;
-	}
-	
-	kState.scroll.deltaX = 0;
-	kState.scroll.deltaY = 0;
+	gState.scroll.deltaX = 0;
+	gState.scroll.deltaY = 0;
 
-	size_t i;
-
-	for (i = 0; i < 256; i++) {
-		kState.buttons[i].just_down = false;
-		kState.buttons[i].just_up = false;
+	for (size_t i = 0; i < 256; i++) {
+		gState.buttons[i].just_down = false;
+		gState.buttons[i].just_up = false;
 	}
-	
 }
 
 void updateButton(size_t buttonIndex, bool isJustDown, bool isPress) {
-	kState.buttons[buttonIndex].down = isPress;
+	gState.buttons[buttonIndex].down = isPress;
 
 	if (isJustDown) {
-		kState.buttons[buttonIndex].just_down = true;
+		gState.buttons[buttonIndex].just_down = true;
 	}
 	else {
-		kState.buttons[buttonIndex].just_up = true;
+		gState.buttons[buttonIndex].just_up = true;
 	}
 	
 }
 
 void endUpdateState() {
+	if (!gFirstUpdate){
+		for (size_t i = 0; i < 256; i++) {
+			ButtonState& b = gState.buttons[i];
 
+			if (b.drag.status == DragState::NONE) {
+				if (!b.just_down && b.down && (gLastState.x != gState.x || gLastState.y != gState.y)) {
+					b.drag.status = DragState::START;
+					b.drag.startX = gLastState.x;
+					b.drag.startY = gLastState.y;
+				}
+			}
+			else {
+				if (b.down) {
+					b.drag.deltaX = gState.x - b.drag.startX;
+					b.drag.deltaY = gState.y - b.drag.startY;
+					b.drag.status = DragState::MOVE;
+				}
+				else if (b.just_up) {
+					b.drag.status = DragState::END;
+				}
+				else if (b.drag.status == DragState::END){
+					b.drag.status = DragState::NONE;
+				}
+			}			
+		}
+
+	}
+	else {
+		for (size_t i = 0; i < 256; i++) {
+			gState.buttons[i].drag.status = DragState::NONE;
+		}
+	}
+	
+
+	gLastState = gState;
+
+	if (gFirstUpdate) {
+		gFirstUpdate = false;
+	}
 }
 
 void updatePosition(int32_t x, int32_t y) {
-	kState.x = x;
-	kState.y = y;
+	gState.x = x;
+	gState.y = y;
 }
 
 void updateScrollDelta(int32_t x, int32_t y) {
-	kState.scroll.deltaX = x;
-	kState.scroll.deltaY = y;
+	gState.scroll.deltaX = x;
+	gState.scroll.deltaY = y;
 }
 
 

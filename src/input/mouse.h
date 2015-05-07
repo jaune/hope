@@ -13,16 +13,37 @@ namespace mouse {
 		BOUTON_MIDDLE = 2
 	};
 
+
+
+	struct ScrollState {
+		int32_t deltaX;
+		int32_t deltaY;
+	};
+	
+	struct DragState {
+		enum Status {
+			NONE = 0,
+			START,
+			MOVE,
+			END
+		};
+
+		Status status;
+
+		int32_t deltaX;
+		int32_t deltaY;
+
+		int32_t startX;
+		int32_t startY;
+	};
+
 	struct ButtonState {
 		bool down;
 
 		bool just_down;
 		bool just_up;
-	};
 
-	struct ScrollState {
-		int32_t deltaX;
-		int32_t deltaY;
+		DragState drag;
 	};
 
 	struct MouseState {

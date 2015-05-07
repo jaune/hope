@@ -9,6 +9,7 @@ namespace core {
 	typedef uint32_t Tick;
 
 	Tick getTicks(void);
+
 	void getViewportSize(int32_t *w, int32_t *h);
 
 namespace nacl {

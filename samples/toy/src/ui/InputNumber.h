@@ -6,6 +6,8 @@
 namespace ui {
 	using namespace hope::ui;
 
+
+
 	template <typename T>
 	struct InputNumber {
 
@@ -15,7 +17,7 @@ namespace ui {
 			T minValue;
 			T maxValue;
 
-			std::function<void(T)> onChange;
+			hope::ui::Callback<T> onChange;
 		};
 		
 
@@ -26,24 +28,16 @@ namespace ui {
 			style.height = Size::pc(1.0f);
 
 			c->setListener<event::Scroll>(root, onScroll);
-			c->setListener<event::Click>(root, onClick);
-
-			//			c->addListener<event::DragAndDropBegin>(root, InputNumber::onDragAndDropBegin);
-			//			c->addListener<event::DragAndDropEnd>(root, InputNumber::onDragAndDropEnd);
-			//			c->addListener<event::DragAndDropMove>(root, InputNumber::onDragAndDropMove);
+			c->setListener<event::DragMove>(root, onDragMove);
 
 			c->setText(root, std::to_string(props.value));
 		}
 
-		static void onClick(Canvas* c, ElementId id, const event::Click::Event& e) {
-			hope::console::log(" --- Click --- %d ", id);
-		}
-
-		static void onScroll(Canvas* c, ElementId id, const event::Scroll::Event& e) {
+		static void setValue(Canvas* c, ElementId id, T value) {
 			const Props& props = c->getProps<InputNumber>(id);
-			
-			T value = props.value + ((T)e.deltaY * props.step);
 
+			value = ((value + props.step - 1) / props.step) * props.step;
+			
 			if (value > props.maxValue) {
 				value = props.maxValue;
 			}
@@ -52,19 +46,23 @@ namespace ui {
 				value = props.minValue;
 			}
 
-			props.onChange(value);
-
-			// hope::console::log("#%d = %f => %f", id, props.value, value);
-			// hope::console::log(" --- Scroll(%d, %d) --- %d ", e.deltaX, e.deltaY, id);
+			if (value != props.value) {
+				c->callCallback<T>(props.onChange, value);
+			}
 		}
 
-		void onDragAndDropBegin() {
+		static void onScroll(Canvas* c, ElementId id, const event::Scroll::Event& e) {
+			const Props& props = c->getProps<InputNumber>(id);
+			
+
+			setValue(c, id, props.value + ((T)e.deltaY) * props.step);
 		}
 
-		void onDragAndDropEnd() {
-		}
 
-		void onDragAndDropMove() {
+		static void onDragMove(Canvas* c, ElementId id, const event::DragMove::Event& e) {
+			const Props& props = c->getProps<InputNumber>(id);
+
+			setValue(c, id, e.deltaX * props.step);
 		}
 		
 		typedef std::unordered_map<ElementGid, Props> PropsMap;

@@ -58,16 +58,18 @@
         'src/systems/task/Construction.h',
 
         
-         'src/ui/Canvas.h',
+        'src/ui/Canvas.h',
 
         'src/ui/InputNumber.h',
         'src/ui/StorageList.h',
         'src/ui/StorageListItem.h',
-      
-        
+
+
+        'src/command/Command.h',
+        'src/command/StorageSetItemRequestQuantity.h',
+
 
         'src/TheGridSystem.h',
-        
         'src/TaskSystem.h',
 
         'src/TaskBuilder.h',

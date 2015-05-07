@@ -122,6 +122,8 @@ namespace hope {
 			ElementId firstChild;
 			ElementId lastChild;
 
+			uint16_t propsSum;
+			void* propsData;
 
 			Box box;
 			Style style;
@@ -133,6 +135,9 @@ namespace hope {
 
 				next(0),
 				previous(0),
+
+				propsSum(0),
+				propsData(NULL),
 
 				firstChild(0),
 				lastChild(0) {
@@ -156,6 +161,14 @@ namespace hope {
 		typedef uint8_t CanvasId;
 		class Canvas;
 
+		template <typename T>
+		struct Callback {
+			typedef void(*Function)(Canvas*, ElementId, typename T);
+
+			ElementId element_id;
+			Function function;
+		};
+
 		namespace event {
 			struct Scroll {
 				struct Event {
@@ -178,25 +191,59 @@ namespace hope {
 				};
 
 				typedef std::function<void(Canvas *, ElementId, const Event&)> Callback;
-				typedef std::unordered_map<ElementGid, Callback> ListenerMap;
 
+				typedef std::unordered_map<ElementGid, Callback> ListenerMap;
 				static ListenerMap listeners;
 			};
 			Click::ListenerMap Click::listeners;
 
+			struct DragStart {
+				struct Event {
+					int startX;
+					int startY;
 
+					int deltaX;
+					int deltaY;
+				};
 
-			struct DragAndDropBegin {
-				typedef std::function<void()> Callback;
+				typedef std::function<void(Canvas *, ElementId, const Event&)> Callback;
+
+				typedef std::unordered_map<ElementGid, Callback> ListenerMap;
+				static ListenerMap listeners;
 			};
+			DragStart::ListenerMap DragStart::listeners;
 
-			struct DragAndDropEnd {
-				typedef std::function<void()> Callback;
-			};
+			struct DragEnd {
+				struct Event {
+					int startX;
+					int startY;
 
-			struct DragAndDropMove {
-				typedef std::function<void()> Callback;
+					int deltaX;
+					int deltaY;
+				};
+
+				typedef std::function<void(Canvas *, ElementId, const Event&)> Callback;
+
+				typedef std::unordered_map<ElementGid, Callback> ListenerMap;
+				static ListenerMap listeners;
 			};
+			DragEnd::ListenerMap DragEnd::listeners;
+
+			struct DragMove {
+				struct Event {
+					int startX;
+					int startY;
+
+					int deltaX;
+					int deltaY;
+				};
+
+				typedef std::function<void(Canvas *, ElementId, const Event&)> Callback;
+
+				typedef std::unordered_map<ElementGid, Callback> ListenerMap;
+				static ListenerMap listeners;
+			};
+			DragMove::ListenerMap DragMove::listeners;
 		};
 
 
@@ -207,10 +254,12 @@ namespace hope {
 
 			ElementId root_id;
 			ElementId next_id;
+			ElementId first_id;
 
 			ElementMap elements;
 			TextMap texts;
 
+		private:
 			ElementId createElement() {
 				ElementId id = next_id++;
 
@@ -220,15 +269,43 @@ namespace hope {
 
 				return id;
 			}
+
+			void destroyElement(ElementId id) {
+				auto it = elements.find(id);
+
+				assert(it != elements.end());
+
+				if (it->second->propsData != NULL){
+					free(it->second->propsData);
+				}
+
+				delete it->second;
+
+				elements.erase(it);
+			}
+
+			void destroyText(ElementId id) {
+				auto it = texts.find(id);
+
+				if (it == texts.end()){
+					return;
+				}
+
+				delete it->second;
+
+				texts.erase(it);
+			}
+
 			CanvasId id;
 
 		public:
 			Canvas(CanvasId id) :
 				id(id),
 				root_id(0x32),
-				next_id(0x42) {
+				first_id(0x42),
+				next_id(first_id) {
 
-				elements.insert(ElementMap::value_type(0x32, new Element(0x32)));
+				elements.insert(ElementMap::value_type(root_id, new Element(root_id)));
 			}
 
 			size_t find(float x, float y, std::vector<ElementId>& ids) {
@@ -247,20 +324,11 @@ namespace hope {
 			Element& getElement(ElementId id) {
 				return *(elements.find(id)->second);
 			}
-
-			ElementId appendChildToRoot() {
-				return appendChild(0x32);
+			
+			const Element& getElement(ElementId id) const {
+				return *(elements.find(id)->second);
 			}
 
-			template <typename T>
-			ElementId appendChildToRoot(typename T::Props props) {
-				ElementId id = appendChildToRoot();
-
-				setProps<T>(id, props);
-				T::render(this, id, props);
-
-				return id;
-			}
 
 			ElementId appendChild(ElementId parent_id) {
 				ElementId child_id = createElement();
@@ -286,16 +354,7 @@ namespace hope {
 				return child_id;
 			}
 
-			template <typename T>
-			ElementId appendChild(ElementId parent_id, typename T::Props props) {
-				ElementId id = appendChild(parent_id);
-
-				setProps<T>(id, props);
-				T::render(this, id, props);
-
-				return id;
-			}
-
+			// ----------
 
 			void setText(ElementId id, const std::string& text) {
 				auto it = texts.find(id);
@@ -308,31 +367,134 @@ namespace hope {
 				}
 			}
 
+	
 
-			void setRootSize(float width, float height){
+			// ----------
+
+
+			void setSize(float width, float height){
 				Element& root = getRootElement();
 
 				root.style.width = Size::px(width);
 				root.style.height = Size::px(height);
 			}
 
+			// -----------------
+
+			std::vector<ElementId> garbage;
+
+			void removeElement(ElementId id) {
+				garbage.push_back(id);
+			}
+
+			void removeChildren(ElementId id) {
+				Element& e = getElement(id);
+				ElementId idChild = e.firstChild;
+				
+				e.firstChild = 0;
+				e.lastChild = 0;
+
+				while (idChild != 0) {
+					garbage.push_back(idChild);
+					idChild = getElement(idChild).next;
+				}
+			}
+
+			void destroyGarbage() {
+				for (auto id : garbage){
+					destroyElement(id);
+					destroyText(id);
+				}
+				garbage.clear();
+			}
 
 			// -----------------
 
 			template <typename T>
-			void setProps(ElementId id, const typename T::Props& props) {
-				ElementGid gid = (this->id << 16) | id;
+			ElementId appendChild(ElementId parent_id, typename T::Props props) {
+				ElementId id = appendChild(parent_id);
 
-				T::props.insert(T::PropsMap::value_type(gid, props));
+				setProps<T>(id, props);
+				T::render(this, id, props);
+
+				return id;
+			}
+
+			// -----------------
+
+			template <typename T>
+			void render(ElementId id, const typename T::Props& props) {
+				Element& e = getElement(id);
+
+//				uint16_t sum = computePropsSum((uint8_t*)&props, sizeof(typename T::Props));
+
+//				if (e.propsSum == 0 || e.propsSum != sum){
+					setProps<T>(id, props);
+
+//					if (e.propsSum != 0) {
+//						removeChildren(id);
+//					}
+					T::render(this, id, props);
+
+//					e.propsSum = sum;
+//				}
+			}
+
+			template <typename T>
+			void render(const typename T::Props& props) {
+				removeChildren(root_id);
+				destroyGarbage();
+				next_id = first_id;
+
+				render<T>(root_id, props);
+				// destroyGarbage();
+				updateElementBox();
+			}
+
+			// -----------------
+
+			uint16_t computePropsSum(const uint8_t* data, size_t size) const {
+				uint16_t sum = 0;
+
+				for (size_t i = 0; i < size; ++i) {
+					sum += data[i];
+				}
+
+				sum += 2; // /!\
+
+				return sum;
+			}
+
+			template <typename T>
+			void setProps(ElementId id, const typename T::Props& props) {
+				Element&e = getElement(id);
+				
+				if (e.propsData != NULL) {
+					free(e.propsData);
+				}
+				
+				e.propsData = malloc(sizeof(typename T::Props));
+
+				std::memcpy(e.propsData, &props, sizeof(typename T::Props));
+
+//				ElementGid gid = (this->id << 16) | id;
+//				T::props.insert(T::PropsMap::value_type(gid, props));
 			}
 
 			template <typename T>
 			const typename T::Props& getProps(ElementId id) const {
+/*
 				ElementGid gid = (this->id << 16) | id;
 
 				auto it = T::props.find(gid);
 				assert(it != T::props.end());
 				return it->second;
+*/
+				const Element&e = getElement(id);
+
+				assert(e.propsData != NULL);
+
+				return *(typename T::Props *)e.propsData;
 			}
 
 
@@ -350,9 +512,6 @@ namespace hope {
 				else {
 					T::listeners.insert(T::ListenerMap::value_type(gid, callback));
 				}
-
-
-				
 			}
 
 			template <class T>
@@ -488,6 +647,25 @@ namespace hope {
 
 			// -----------------
 
+			template <typename T>
+			typename Callback<typename T> bindCallback(ElementId id, typename Callback<T>::Function function) const {
+				Callback<T> cb;
+
+				cb.element_id = id;
+				cb.function = function;
+
+				return cb;
+			}
+
+			template <typename T>
+			void callCallback(const Callback<T>& cb, T value) {
+				cb.function(this, cb.element_id, value);
+			}
+
+			
+
+			// -----------------
+
 			void draw(NVGcontext* vg, ElementId id) {
 				Element &e = getElement(id);
 
@@ -507,6 +685,8 @@ namespace hope {
 			}
 
 			void draw(NVGcontext* vg) {
+				drawElementBox(vg);
+
 				nvgFontFace(vg, "sans");
 				nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
 				nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
@@ -514,6 +694,9 @@ namespace hope {
 				draw(vg, root_id);
 			}
 
+			// -----------------
+
+	
 		};
 
 	}
