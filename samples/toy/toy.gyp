@@ -60,13 +60,16 @@
         
         'src/ui/Canvas.h',
 
+        'src/ui/Main.h',
         'src/ui/InputNumber.h',
         'src/ui/StorageList.h',
         'src/ui/StorageListItem.h',
 
+        'src/resource/ItemTable.h',
 
         'src/command/Command.h',
         'src/command/StorageSetItemRequestQuantity.h',
+        'src/command/SetStorageId.h',
 
 
         'src/TheGridSystem.h',

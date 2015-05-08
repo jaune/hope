@@ -6,8 +6,8 @@
 
 #include "./StorageListItem.h"
 #include "../Entities.h"
-
-#include "./action/StorageRequestQuantitySetValue.h"
+#include "../resource/ItemTable.h"
+#include "../command/SetStorageId.h"
 
 namespace ui {
 	using namespace hope::ui;
@@ -18,17 +18,17 @@ namespace ui {
 
 		struct Props {
 			EntityId storage_id;
-			const hope::samples::toy::fbs::ItemTable* table;
 		};
 
 		static void render(Canvas* c, ElementId root, const Props& props) {
 			Style& style = c->getElement(root).style;
 
-// ?????
-//			style.width = Size::pc(0.33f);
-//			style.height = Size::pc(1.0f);
+			style.width = Size::pc(0.33f);
+			style.height = Size::pc(1.0f);
 			style.layout.type = Layout::VERTICAL;
+			style.backgroundColor = nvgRGBA(255, 0, 255, 255);
 
+			
 			{
 				ElementId title = c->appendChild(root);
 
@@ -38,7 +38,7 @@ namespace ui {
 				style.height = Size::px(20.0f);
 				style.layout.type = Layout::HORIZONTAL;
 
-
+				
 				// label
 				{
 					auto e = c->appendChild(title);
@@ -64,40 +64,37 @@ namespace ui {
 				}
 			}
 
-			const ItemBag& items = Components::get<ItemBagComponent>(props.storage_id)->items;
-			const ItemBag& requests = Components::get<StorageComponent>(props.storage_id)->request_quantities;
-			
-			const hope::samples::toy::fbs::ItemTable* table = props.table;
+			{
+				const ItemBag& items = Components::get<ItemBagComponent>(props.storage_id)->items;
+				const ItemBag& requests = Components::get<StorageComponent>(props.storage_id)->request_quantities;
 
-			size_t i = 0;
-			for (auto it = table->items()->begin(); it != table->items()->end(); ++it) {
+				const hope::samples::toy::fbs::ItemTable* table = resource::ItemTable::all();
 
-				StorageListItem::Props sli_p;
+				size_t i = 0;
+				for (auto it = table->items()->begin(); it != table->items()->end(); ++it) {
 
-				sli_p.item_id = it->id();
-				sli_p.storage_id = props.storage_id;
-				sli_p.label = it->label()->c_str();
-				sli_p.quantity = items.getItemQuantity(it->id());
-				sli_p.request_quantity = requests.getItemQuantity(it->id());
-				
-				//sli_p.onRequestQuantityChange = std::bind(onRequestQuantityChange, c, root, it->id(), std::placeholders::_1);
+					StorageListItem::Props sli_p;
 
-				c->appendChild<StorageListItem>(root, sli_p);
+					sli_p.item_id = it->id();
+					sli_p.storage_id = props.storage_id;
+					sli_p.label = it->label()->c_str();
+					sli_p.quantity = items.getItemQuantity(it->id());
+					sli_p.request_quantity = requests.getItemQuantity(it->id());
 
-				i++;
+					c->appendChild<StorageListItem>(root, sli_p);
+
+					i++;
+				}
 			}
-		}
-
-		
+		}		
 
 		static void onClick(Canvas* c, ElementId id, const event::Click::Event& e) {
-			hope::console::log(" --- Click --- %d ", id);
+			command::SetStorageId command;
+			command.storage_id = 0;
+			command::trigger(command);
 		}
 
-		typedef std::unordered_map<ElementGid, Props> PropsMap;
-		static PropsMap props;
 	};
-	StorageList::PropsMap StorageList::props;
 
 }
 

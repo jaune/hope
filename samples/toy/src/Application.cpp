@@ -5,7 +5,6 @@
 #include <console.h>
 #include <input/mouse.h>
 #include <asset/asset.h>
-#include <asset/asset.h>
 #include <nvg.h>
 
 #include <unordered_set>
@@ -45,7 +44,7 @@
 #include "./factories/agent.h"
 
 #include "./ui/Canvas.h"
-#include "./ui/StorageList.h"
+#include "./ui/Main.h"
 
 hope::ui::Canvas uiCanvas(1);
 bool uiNeededRender = true;
@@ -79,10 +78,7 @@ ComponentManager<ItemGiveActionComponent> Components::manager_ItemGiveActionComp
 
 
 
-typedef std::unordered_map<int32_t, const hope::samples::toy::fbs::Item*> ItemTable;
 
-
-static ItemTable kItemTable;
 
 static hope::ai::plan::NeedType N_SLEEP;
 static hope::ai::plan::NeedType N_DRINK;
@@ -418,6 +414,8 @@ void initializeEntities() {
 
 }
 
+#include "./command/Command.h"
+
 // hope::grid::PathFinder* gPathFinder = NULL;
 
 void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQuantity& command){
@@ -432,19 +430,18 @@ void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQ
 	uiNeededRender = true;
 }
 
+void command_SetStorageId(const command::SetStorageId& command){
+	gStorageId = command.storage_id;
+
+	uiNeededRender = true;
+}
+
 void Application::onInitialize(void) {
 
 	hope::asset::Asset asset_ConstructionRecipeTable = hope::asset::get("ConstructionRecipeTable.json(flatc)");
 	systems::task::Construction.loadConstructionRecipeTable(asset_ConstructionRecipeTable);
 
-	asset_ItemTable = hope::asset::get("ItemTable.json(flatc)");
-	const hope::samples::toy::fbs::ItemTable* table_ItemTable = hope::samples::toy::fbs::GetItemTable(asset_ItemTable.pointer);
-
-	for (auto it = table_ItemTable->items()->begin(); it != table_ItemTable->items()->end(); ++it) {
-		kItemTable.insert(ItemTable::value_type(it->id(), *it));
-	}
-
-
+	resource::ItemTable::initialize("ItemTable.json(flatc)");
 
 	defaultMapping.bind(hope::input::keyboard::KEY_Q, this->createCommad<BeginWallConstructionCommand>());
 	defaultMapping.bind(hope::input::keyboard::KEY_W, this->createCommad<BeginFloorConstructionCommand>());
@@ -456,6 +453,7 @@ void Application::onInitialize(void) {
 
 	command::createMapping();
 	command::bind<command::StorageSetItemRequestQuantity>(command_StorageSetItemRequestQuantity);
+	command::bind<command::SetStorageId>(command_SetStorageId);
 
 
 	initializeGrid();
@@ -804,7 +802,7 @@ void nvgStackTextTaskDetail(EntityId id) {
 	nvgStackText("== items ==");
 	for (auto it = task->recipe->items()->begin(); it != task->recipe->items()->end(); ++it){
 		int32_t quantity = bag->items.getItemQuantity(it->item_id());
-		nvgStackText("%s: %d / %d", kItemTable[it->item_id()]->label()->c_str(), quantity, it->quantity());
+		nvgStackText("%s: %d / %d", resource::ItemTable::get(it->item_id())->label()->c_str(), quantity, it->quantity());
 	}
 	nvgStackText("=============");
 }
@@ -828,7 +826,7 @@ void StorageComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 
 	for (auto it = c->request_quantities.items.begin(); it != c->request_quantities.items.end(); ++it){
 		int32_t quantity = bag->items.getItemQuantity(it->first);
-		nvgStackText("%s: %d / %d", kItemTable[it->first]->label()->c_str(), quantity, it->second);
+		nvgStackText("%s: %d / %d", resource::ItemTable::get(it->first)->label()->c_str(), quantity, it->second);
 	}
 
 	nvgStackText("=============");
@@ -845,7 +843,7 @@ void DepositComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 		return;
 	}
 
-	nvgStackText("==== Deposit \"%s\" #%d ====", kItemTable[c->item_id]->label()->c_str(), id);
+	nvgStackText("==== Deposit \"%s\" #%d ====", resource::ItemTable::get(c->item_id)->label()->c_str(), id);
 
 	for (auto it = c->item_quantities.begin(); it != c->item_quantities.end(); ++it){
 		nvgStackText("%d", (*it));
@@ -869,7 +867,7 @@ void ItemBagComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 	nvgStackText("==== ItemBag #%d ====", id);
 
 	for (auto it = c->items.items.begin(); it != c->items.items.end(); ++it){
-		nvgStackText("%s: %d", kItemTable[it->first]->label()->c_str(), it->second);
+		nvgStackText("%s: %d", resource::ItemTable::get(it->first)->label()->c_str(), it->second);
 	}
 
 	nvgStackText("=============");
@@ -1084,18 +1082,15 @@ void Application::onLoop(void) {
 	// -------------------------- UPDATE WORLD
 
 
-	if (uiNeededRender) {
-		ui::StorageList::Props sl_p;
-		sl_p.storage_id = gStorageId;
-		sl_p.table = hope::samples::toy::fbs::GetItemTable(asset_ItemTable.pointer);
+	//if (uiNeededRender) {
+		ui::Main::Props props;
+		
+		props.storage_id = gStorageId;
 
-		uiCanvas.render<ui::StorageList>(sl_p);
-		uiNeededRender = false;
-	}
+		uiCanvas.render<ui::Main>(props);
 
-
-
-
+//		uiNeededRender = false;
+//	}
 
 	// -------------------------- UPDATE GRID
 	updateRenderer();
@@ -1190,7 +1185,7 @@ void Application::drawUI() {
 				nvgStackText("=== items ===");
 
 				for (auto it = icell->items.items.begin(); it != icell->items.items.end(); ++it){
-					nvgStackText("%s: %d", kItemTable[it->first]->label()->c_str(), it->second);
+					nvgStackText("%s: %d", resource::ItemTable::get(it->first)->label()->c_str(), it->second);
 				}
 
 				nvgStackText("=============");

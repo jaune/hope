@@ -25,6 +25,7 @@ namespace ui {
 			style.width = Size::pc(1.00f);
 			style.height = Size::px(15.0f);
 			style.layout.type = Layout::HORIZONTAL;
+			
 
 
 			// label

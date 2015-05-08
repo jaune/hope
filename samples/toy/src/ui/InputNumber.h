@@ -54,7 +54,6 @@ namespace ui {
 		static void onScroll(Canvas* c, ElementId id, const event::Scroll::Event& e) {
 			const Props& props = c->getProps<InputNumber>(id);
 			
-
 			setValue(c, id, props.value + ((T)e.deltaY) * props.step);
 		}
 

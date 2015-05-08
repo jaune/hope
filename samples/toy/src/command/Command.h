@@ -2,6 +2,7 @@
 #define HOPE_SAMPLES_TOY_command_command_H
 
 #include "./StorageSetItemRequestQuantity.h"
+#include "./SetStorageId.h"
 
 #include <queue>
 
@@ -11,12 +12,12 @@ namespace command {
 	typedef uint8_t MappingId;
 
 	const size_t MAPINNG_MAX = 1;
-	const size_t COMMAND_COUNT = 1; // generated ?!
 
 	struct Mapping {
 		bool alive;
 		// generated ?!
 		void(*StorageSetItemRequestQuantity_function)(const StorageSetItemRequestQuantity&);
+		void(*SetStorageId_function)(const SetStorageId&);
 		// generated ?!
 	};
 
@@ -29,7 +30,8 @@ namespace command {
 		union {
 			// generated ?!
 			StorageSetItemRequestQuantity StorageSetItemRequestQuantity;
-			//
+			SetStorageId SetStorageId;
+			// generated ?!
 		};
 	};
 
@@ -58,6 +60,7 @@ namespace command {
 		gMappings[gActiveMapping - 1].alive = false;
 		// generated ?!
 		gMappings[gActiveMapping - 1].StorageSetItemRequestQuantity_function = NULL;
+		gMappings[gActiveMapping - 1].SetStorageId_function = NULL;
 		// generated ?!
 
 	}
@@ -123,6 +126,30 @@ namespace command {
 	}
 	// generated ?!
 	
+	// generated ?!
+	const CommandType SET_STORAGE_ID = 0x02;
+
+	template<>
+	void trigger<SetStorageId>(const SetStorageId& command) {
+		command::Command c;
+		c.type = SET_STORAGE_ID;
+		c.SetStorageId = command;
+		trigger(c);
+	}
+
+	template <>
+	void bind<SetStorageId>(void(*function)(const SetStorageId&)) {
+		gMappings[gActiveMapping - 1].SetStorageId_function = function;
+	}
+
+	template <>
+	void unbind<SetStorageId>() {
+		gMappings[gActiveMapping - 1].SetStorageId_function = NULL;
+	}
+	// generated ?!
+
+	
+
 
 	// ----------------
 
@@ -141,6 +168,13 @@ namespace command {
 					gMappings[gActiveMapping - 1].StorageSetItemRequestQuantity_function(command.StorageSetItemRequestQuantity);
 				}
 				break;
+
+			case SET_STORAGE_ID:
+				if (gMappings[gActiveMapping - 1].SetStorageId_function != NULL) {
+					gMappings[gActiveMapping - 1].SetStorageId_function(command.SetStorageId);
+				}
+				break;
+			
 			// generated ?!
 			}
 		}

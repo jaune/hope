@@ -99,13 +99,16 @@ namespace hope {
 			}
 		};
 
-		typedef uint16_t StyleId;
 
 		struct Style {
-			StyleId id;
 			Size height;
 			Size width;
 			Layout layout;
+			NVGcolor backgroundColor;
+
+			Style() : 
+				backgroundColor(nvgRGBA(0, 0, 0, 0)) {
+			}
 		};
 
 
@@ -121,6 +124,8 @@ namespace hope {
 
 			ElementId firstChild;
 			ElementId lastChild;
+
+			std::string text;
 
 			uint16_t propsSum;
 			void* propsData;
@@ -142,18 +147,6 @@ namespace hope {
 				firstChild(0),
 				lastChild(0) {
 			}
-		};
-
-
-
-		struct Text {
-		public:
-			std::string text;
-
-			Text(const std::string& text) :
-				text(text) {
-			}
-
 		};
 
 		typedef uint32_t ElementGid;
@@ -250,53 +243,36 @@ namespace hope {
 		class Canvas {
 
 			typedef std::unordered_map <ElementId, Element*> ElementMap;
-			typedef std::unordered_map <ElementId, Text*> TextMap;
 
 			ElementId root_id;
 			ElementId next_id;
 			ElementId first_id;
 
 			ElementMap elements;
-			TextMap texts;
 
 		private:
 			ElementId createElement() {
 				ElementId id = next_id++;
 
 				auto e = new Element(id);
-
 				elements.insert(ElementMap::value_type(id, e));
-
 				return id;
 			}
 
-			void destroyElement(ElementId id) {
-				auto it = elements.find(id);
+			void destroyElements() {
+				for (auto it = elements.begin(); it != elements.end(); ++it) {
 
-				assert(it != elements.end());
+					if (it->second->propsData != NULL){
+						free(it->second->propsData);
+					}
 
-				if (it->second->propsData != NULL){
-					free(it->second->propsData);
+					delete it->second;
+
 				}
-
-				delete it->second;
-
-				elements.erase(it);
+				elements.clear();
 			}
 
-			void destroyText(ElementId id) {
-				auto it = texts.find(id);
-
-				if (it == texts.end()){
-					return;
-				}
-
-				delete it->second;
-
-				texts.erase(it);
-			}
-
-			CanvasId id;
+		CanvasId id;
 
 		public:
 			Canvas(CanvasId id) :
@@ -304,9 +280,7 @@ namespace hope {
 				root_id(0x32),
 				first_id(0x42),
 				next_id(first_id) {
-
-				elements.insert(ElementMap::value_type(root_id, new Element(root_id)));
-			}
+			}			
 
 			size_t find(float x, float y, std::vector<ElementId>& ids) {
 				for (auto element : elements) {
@@ -357,55 +331,17 @@ namespace hope {
 			// ----------
 
 			void setText(ElementId id, const std::string& text) {
-				auto it = texts.find(id);
-
-				if (it == texts.end()) {
-					texts.insert(TextMap::value_type(id, new Text(text)));
-				}
-				else {
-					it->second->text = text;
-				}
+				getElement(id).text = text;
 			}
-
-	
+				
 
 			// ----------
 
+			float width; float height;
 
 			void setSize(float width, float height){
-				Element& root = getRootElement();
-
-				root.style.width = Size::px(width);
-				root.style.height = Size::px(height);
-			}
-
-			// -----------------
-
-			std::vector<ElementId> garbage;
-
-			void removeElement(ElementId id) {
-				garbage.push_back(id);
-			}
-
-			void removeChildren(ElementId id) {
-				Element& e = getElement(id);
-				ElementId idChild = e.firstChild;
-				
-				e.firstChild = 0;
-				e.lastChild = 0;
-
-				while (idChild != 0) {
-					garbage.push_back(idChild);
-					idChild = getElement(idChild).next;
-				}
-			}
-
-			void destroyGarbage() {
-				for (auto id : garbage){
-					destroyElement(id);
-					destroyText(id);
-				}
-				garbage.clear();
+				this->width = width;
+				this->height = height;
 			}
 
 			// -----------------
@@ -426,44 +362,21 @@ namespace hope {
 			void render(ElementId id, const typename T::Props& props) {
 				Element& e = getElement(id);
 
-//				uint16_t sum = computePropsSum((uint8_t*)&props, sizeof(typename T::Props));
-
-//				if (e.propsSum == 0 || e.propsSum != sum){
-					setProps<T>(id, props);
-
-//					if (e.propsSum != 0) {
-//						removeChildren(id);
-//					}
-					T::render(this, id, props);
-
-//					e.propsSum = sum;
-//				}
+				setProps<T>(id, props);
+				T::render(this, id, props);
 			}
 
 			template <typename T>
 			void render(const typename T::Props& props) {
-				removeChildren(root_id);
-				destroyGarbage();
+				destroyElements();
+				elements.insert(ElementMap::value_type(root_id, new Element(root_id)));
 				next_id = first_id;
 
 				render<T>(root_id, props);
-				// destroyGarbage();
-				updateElementBox();
+				updateElementBox(root_id);
 			}
 
 			// -----------------
-
-			uint16_t computePropsSum(const uint8_t* data, size_t size) const {
-				uint16_t sum = 0;
-
-				for (size_t i = 0; i < size; ++i) {
-					sum += data[i];
-				}
-
-				sum += 2; // /!\
-
-				return sum;
-			}
 
 			template <typename T>
 			void setProps(ElementId id, const typename T::Props& props) {
@@ -476,20 +389,10 @@ namespace hope {
 				e.propsData = malloc(sizeof(typename T::Props));
 
 				std::memcpy(e.propsData, &props, sizeof(typename T::Props));
-
-//				ElementGid gid = (this->id << 16) | id;
-//				T::props.insert(T::PropsMap::value_type(gid, props));
 			}
 
 			template <typename T>
 			const typename T::Props& getProps(ElementId id) const {
-/*
-				ElementGid gid = (this->id << 16) | id;
-
-				auto it = T::props.find(gid);
-				assert(it != T::props.end());
-				return it->second;
-*/
 				const Element&e = getElement(id);
 
 				assert(e.propsData != NULL);
@@ -567,6 +470,7 @@ namespace hope {
 					}
 					break;
 				case Size::NONE:
+					e.box.setY(x, x + 3);
 					break;
 				}
 				// refactor !!!!
@@ -604,6 +508,10 @@ namespace hope {
 				}
 				// refactor !!!!
 
+				if (id == root_id) {
+					e.box.setX(0, width);
+					e.box.setY(0, height);
+				}
 
 				ElementId idChild = e.firstChild;
 
@@ -614,13 +522,9 @@ namespace hope {
 			}
 
 
-			void updateElementBox(){
-				updateElementBox(root_id);
-			}
-
 			// -----------------
 
-			void drawElementBox(NVGcontext* vg, const Box& box, const NVGcolor& color) {
+			void drawBox(NVGcontext* vg, const Box& box, const NVGcolor& color) {
 				nvgBeginPath(vg);
 				nvgRect(vg, box.xMin, box.yMin, box.width(), box.height());
 				nvgFillColor(vg, color);
@@ -631,7 +535,7 @@ namespace hope {
 			void drawElementBox(NVGcontext* vg, ElementId id) {
 				Element &e = getElement(id);
 
-				drawElementBox(vg, e.box, nvgHSLA((id * NVG_PI * 2) / elements.size(), 1.0f, 0.33f, 33));
+				drawBox(vg, e.box, nvgHSLA((id * NVG_PI * 2) / elements.size(), 1.0f, 0.33f, 33));
 
 				ElementId idChild = e.firstChild;
 
@@ -669,11 +573,14 @@ namespace hope {
 			void draw(NVGcontext* vg, ElementId id) {
 				Element &e = getElement(id);
 
-				auto it = texts.find(id);
+				drawBox(vg, e.box, e.style.backgroundColor);
+				nvgFontFace(vg, "sans");
+				nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+				nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
 
-				if (it != texts.end()){
+				if (!e.text.empty()){
 					nvgFontSize(vg, e.box.height());
-					nvgText(vg, e.box.xMin, e.box.yMin, it->second->text.c_str(), NULL);
+					nvgText(vg, e.box.xMin, e.box.yMin, e.text.c_str(), NULL);
 				}
 
 				ElementId idChild = e.firstChild;
@@ -685,12 +592,7 @@ namespace hope {
 			}
 
 			void draw(NVGcontext* vg) {
-				drawElementBox(vg);
-
-				nvgFontFace(vg, "sans");
-				nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
-				nvgFillColor(vg, nvgRGBA(255, 255, 255, 255));
-
+				// drawElementBox(vg);
 				draw(vg, root_id);
 			}
 
