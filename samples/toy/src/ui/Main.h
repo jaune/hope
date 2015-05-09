@@ -15,6 +15,8 @@ namespace ui {
 		};
 
 		static void render(Canvas* c, ElementId root, const Props& props) {
+			c->getElement(root).stopPropagation = false;
+
 			Style& style = c->getElement(root).style;
 
 			style.width = Size::pc(1.f);

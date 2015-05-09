@@ -125,6 +125,8 @@ namespace hope {
 			ElementId firstChild;
 			ElementId lastChild;
 
+			bool stopPropagation;
+
 			std::string text;
 
 			uint16_t propsSum;
@@ -140,6 +142,8 @@ namespace hope {
 
 				next(0),
 				previous(0),
+
+				stopPropagation(true),
 
 				propsSum(0),
 				propsData(NULL),
@@ -423,11 +427,19 @@ namespace hope {
 
 				find(x, y, ids);
 
+				std::sort(ids.begin(), ids.end(), std::greater<ElementId>());
+
 				for (auto it = ids.begin(); it != ids.end(); ++it) {
-					ElementGid gid = (this->id << 16) | *it;
+					ElementId id = *it;
+
+					ElementGid gid = (this->id << 16) | id;
 					auto itListener = T::listeners.find(gid);
 					if (itListener != T::listeners.end()) {
-						itListener->second(this, *it, e);
+						itListener->second(this, id, e);
+						return true;
+					}
+
+					if (getElement(id).stopPropagation) {
 						return true;
 					}
 				}

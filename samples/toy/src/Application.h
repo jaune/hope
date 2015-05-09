@@ -61,18 +61,9 @@ class Application : public ::hope::entry::Application {
 	void updateRenderer();
 	void drawUI();
 		
-	template <typename T>
-	void updateRenderer(const T *items, size_t length, uint8_t tileIndex)
-	{
-		const T* item = items;
-		const T* end = items + length;
 
-		for (; item != end; item++) {
-			gridRenderer.set(item->position.x, item->position.y, tileIndex);
-		}
-	}
 
-	TileRenderer gridRenderer;
+
 
 	hope::input::keyboard::Mapping defaultMapping;
 	hope::input::keyboard::Mapping constructMapping;

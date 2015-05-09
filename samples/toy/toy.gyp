@@ -68,8 +68,12 @@
         'src/resource/ItemTable.h',
 
         'src/command/Command.h',
+        'src/command/Command.cpp',
         'src/command/StorageSetItemRequestQuantity.h',
         'src/command/SetStorageId.h',
+        'src/command/AddConstructionTask.h',
+        'src/command/CancelConstructionTask.h',
+        
 
 
         'src/TheGridSystem.h',

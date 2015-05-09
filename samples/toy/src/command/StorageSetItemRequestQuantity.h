@@ -1,7 +1,7 @@
 #ifndef HOPE_SAMPLES_TOY_command_StorageSetItemRequestQuantity_H
 #define HOPE_SAMPLES_TOY_command_StorageSetItemRequestQuantity_H
 
-#include "../Entities.h"
+#include "../types.h"
 
 namespace command {
 

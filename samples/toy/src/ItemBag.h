@@ -1,9 +1,7 @@
 #ifndef HOPE_SAMPLES_TOY_ITEMBAG_H
 #define HOPE_SAMPLES_TOY_ITEMBAG_H
 
-
-typedef int32_t ItemId;
-typedef int16_t ItemQuantity;
+#include "./types.h"
 
 
 //typedef std::unordered_map<ItemId, ItemQuantity> ItemBag;

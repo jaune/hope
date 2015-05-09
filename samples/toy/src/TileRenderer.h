@@ -182,8 +182,8 @@ public:
 		updateViewportMatrix();
 	}
 
-	void translate(float x, float y) {
-		uTranslationMatrix = mathfu::mat4::FromTranslationVector(mathfu::vec3(x, y, 0.f));
+	void translate(const mathfu::vec3& v) {
+		uTranslationMatrix = mathfu::mat4::FromTranslationVector(v);
 		updateViewportMatrix();
 	}
 		

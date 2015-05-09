@@ -416,10 +416,9 @@ void initializeEntities() {
 
 #include "./command/Command.h"
 
-// hope::grid::PathFinder* gPathFinder = NULL;
 
 void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQuantity& command){
-	
+
 	auto sc = Components::get<StorageComponent>(
 		command.storage_id);
 
@@ -435,6 +434,18 @@ void command_SetStorageId(const command::SetStorageId& command){
 
 	uiNeededRender = true;
 }
+
+void command_AddConstructionTask(const command::AddConstructionTask& command){
+	if (command.stroke_width == 0) {
+		systems::TheGrid()->kToyGrid->queryFillRect(command.x, command.y, command.width, command.height, wallConstructionCallback);
+	}
+	else {
+		systems::TheGrid()->kToyGrid->queryRect(command.x, command.y, command.width, command.height, command.stroke_width, floorConstructionCallback, wallConstructionCallback);
+	}
+}
+
+
+
 
 void Application::onInitialize(void) {
 
@@ -454,6 +465,7 @@ void Application::onInitialize(void) {
 	command::createMapping();
 	command::bind<command::StorageSetItemRequestQuantity>(command_StorageSetItemRequestQuantity);
 	command::bind<command::SetStorageId>(command_SetStorageId);
+	command::bind<command::AddConstructionTask>(command_AddConstructionTask);
 
 
 	initializeGrid();
@@ -514,12 +526,28 @@ void Application::onInitialize(void) {
 
 
 
-
+#include "./command/AddConstructionTask.h"
+#include "./command/CancelConstructionTask.h"
 
 void Application::onRelease(void) {
 }
 
 void applyMouseMode(MouseMode mode, const hope::grid::AABox& box) {
+	/*
+	if (false)
+	{
+		command::AddConstructionTask c;
+		c.x = 0;
+		c.y = 0;
+		c.width = 1;
+		c.height = 1;
+		c.fill_recipe_id = 353441; // WALL
+		c.stroke_width = 0;
+		command::trigger(c);
+	}
+*/
+
+
 	switch (mode)
 	{
 
@@ -527,42 +555,56 @@ void applyMouseMode(MouseMode mode, const hope::grid::AABox& box) {
 		break;
 	}
 	case MOUSE_MODE_ROOM: {
+		command::AddConstructionTask c;
 
-		systems::TheGrid()->kToyGrid->queryRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, 1, floorConstructionCallback, wallConstructionCallback);
-		//		updateRooms();
-		//		updateVoid();
+		c.x = box.xMin;
+		c.y = box.yMin;
+		c.width = box.width() + 1;
+		c.height = box.width() + 1;
+		
+		c.fill_recipe_id = 574164; // FLOOR
+		c.stroke_width = 1;
+		c.stroke_recipe_id = 353441; // WALL
+
+		command::trigger(c);
 		break;
 	}
 
 	case MOUSE_MODE_WALL: {
+		command::AddConstructionTask c;
 
+		c.x = box.xMin;
+		c.y = box.yMin;
+		c.width = box.width() + 1;
+		c.height = box.width() + 1;
+		c.fill_recipe_id = 353441; // WALL
+		c.stroke_width = 0;
 
-		systems::TheGrid()->kToyGrid->queryFillRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, wallConstructionCallback);
-
-		// TheGrid::kTaskPool->sortHeadersByLevelAndPriority();
-
-		//		updateRooms();
-		//		updateVoid();
+		command::trigger(c);
 		break;
 	}
 	case MOUSE_MODE_FLOOR: {
+		command::AddConstructionTask c;
 
-		systems::TheGrid()->kToyGrid->queryFillRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, floorConstructionCallback);
+		c.x = box.xMin;
+		c.y = box.yMin;
+		c.width = box.width() + 1;
+		c.height = box.width() + 1;
+		c.fill_recipe_id = 574164; // FLOOR
+		c.stroke_width = 0;
 
-		// TheGrid::kTaskPool->sortHeadersByLevelAndPriority();
-
-		//		updateRooms();
-		//		updateVoid();
-
+		command::trigger(c);
 		break;
 	}
 	case MOUSE_MODE_CANCEL: {
+		command::CancelConstructionTask c;
 
-		systems::TheGrid()->kToyGrid->queryFillRect(box.xMin, box.yMin, box.width() + 1, box.height() + 1, cancelConstructionCallback);
+		c.x = box.xMin;
+		c.y = box.yMin;
+		c.width = box.width() + 1;
+		c.height = box.width() + 1;
 
-		//		updateRooms();
-		//		updateVoid();
-
+		command::trigger(c);
 		break;
 	}
 	default:
@@ -650,7 +692,7 @@ void ConstructionTaskComponent_foreach_updateRenderer(TileRenderer& gridRenderer
 	}
 }
 
-
+TileRenderer gGridRenderer;
 
 uint8_t toTileIndex(int32_t x, int32_t y) {
 	return kTileIndexTable.get(systems::TheGrid()->getCellType(x, y),
@@ -724,28 +766,28 @@ void Application::updateRenderer() {
 			}
 
 
-			gridRenderer.set(x, y, tileIndex);
+			gGridRenderer.set(x, y, tileIndex);
 		}
 	}
 
 
 
-	std::function <void(ConstructionTaskComponent*, EntityId)> f0 = std::bind(ConstructionTaskComponent_foreach_updateRenderer, gridRenderer, std::placeholders::_1, std::placeholders::_2);
+	std::function <void(ConstructionTaskComponent*, EntityId)> f0 = std::bind(ConstructionTaskComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<ConstructionTaskComponent>(f0);
 
-	std::function <void(StorageComponent*, EntityId)> f2 = std::bind(StoreComponent_foreach_updateRenderer, gridRenderer, std::placeholders::_1, std::placeholders::_2);
+	std::function <void(StorageComponent*, EntityId)> f2 = std::bind(StoreComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<StorageComponent>(f2);
 
 
-	std::function <void(AgentComponent*, EntityId)> f1 = std::bind(AgentComponent_foreach_updateRenderer, gridRenderer, std::placeholders::_1, std::placeholders::_2);
+	std::function <void(AgentComponent*, EntityId)> f1 = std::bind(AgentComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<AgentComponent>(f1);
 
-	std::function <void(DepositComponent*, EntityId)> f3 = std::bind(DepositComponent_foreach_updateRenderer, gridRenderer, std::placeholders::_1, std::placeholders::_2);
+	std::function <void(DepositComponent*, EntityId)> f3 = std::bind(DepositComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<DepositComponent>(f3);
 
 
 
-	gridRenderer.commit();
+	gGridRenderer.commit();
 }
 
 void nvgDrawMenuText(float x, float y, const char* shortcut, const char* title, bool isActive) {
@@ -767,22 +809,11 @@ static float kDragStartX = 0.f;
 static float kDragStartY = 0.f;
 */
 
-
-
-
-hope::input::mouse::DragAndDrop kDnDView(::hope::input::mouse::ButtonIndex::BOUTON_MIDDLE);
-hope::input::mouse::DragAndDrop kDnDSelection(::hope::input::mouse::ButtonIndex::BOUTON_LEFT);
-
-
-static float kRendererOffsetX = 0.f;
-static float kRendererOffsetY = 0.f;
-
-static bool kSelectionInProgress = false;
+mathfu::vec3 gRendererOffset;
+mathfu::vec3 gDragStartRendererOffset;
 
 static hope::grid::AABox kSelectionBox;
 static hope::grid::Location kSelectionStartLocation;
-
-
 
 
 
@@ -919,7 +950,119 @@ hope::gles2::Framebuffer framebuffer;
 
 hope::grid::Location mouseLocation;
 
+bool notifyCanvas(const ::hope::input::mouse::MouseState& mouseState){
 
+	bool caught = false;
+
+	if (mouseState.scroll.deltaX != 0 || mouseState.scroll.deltaY != 0)
+	{
+		hope::ui::event::Scroll::Event e;
+
+		e.deltaX = mouseState.scroll.deltaX;
+		e.deltaY = mouseState.scroll.deltaY;
+
+		caught = caught || uiCanvas.notify<hope::ui::event::Scroll>(mouseState.x, mouseState.y, e);
+	}
+
+	for (size_t i = 0; i < 256; ++i) {
+		if (mouseState.buttons[i].just_up)
+		{
+			hope::ui::event::Click::Event e;
+			e.x = mouseState.x;
+			e.y = mouseState.y;
+			caught = caught || uiCanvas.notify<hope::ui::event::Click>(mouseState.x, mouseState.y, e);
+		}
+		if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::START)
+		{
+			hope::ui::event::DragStart::Event e;
+
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
+
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			caught = caught || uiCanvas.notify<hope::ui::event::DragStart>(mouseState.x, mouseState.y, e);
+		}
+		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::END)
+		{
+			hope::ui::event::DragEnd::Event e;
+
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
+
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			caught = caught || uiCanvas.notify<hope::ui::event::DragEnd>(e.startX, e.startY, e);
+		}
+		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::MOVE)
+		{
+			hope::ui::event::DragMove::Event e;
+
+			e.startX = mouseState.buttons[i].drag.startX;
+			e.startY = mouseState.buttons[i].drag.startY;
+
+			e.deltaX = mouseState.buttons[i].drag.deltaX;
+			e.deltaY = mouseState.buttons[i].drag.deltaY;
+
+			caught = caught || uiCanvas.notify<hope::ui::event::DragMove>(e.startX, e.startY, e);
+		}
+	}
+
+	return caught;
+}
+
+
+void notifyGrid(const ::hope::input::mouse::MouseState& mouseState) {
+	int32_t winWidth = 1024, winHeight = 768;
+	hope::core::getViewportSize(&winWidth, &winHeight);
+
+	float_t xCenter = winWidth / 2.0f;
+	float_t yCenter = winHeight / 2.0f;
+
+	{
+		const ::hope::input::mouse::ButtonState& bs = mouseState.buttons[::hope::input::mouse::BOUTON_MIDDLE];
+
+		mathfu::vec3 delta(bs.drag.deltaX, bs.drag.deltaY, 0.f);
+
+		switch (bs.drag.status) {
+		case hope::input::mouse::DragState::START: {
+			gDragStartRendererOffset = gRendererOffset;
+		} break;
+		case hope::input::mouse::DragState::END:
+		case hope::input::mouse::DragState::MOVE: {
+			gRendererOffset = gDragStartRendererOffset + delta;
+		} break;
+		}
+	}
+
+	gGridRenderer.translate(gRendererOffset);
+	gGridRenderer.zoom((float)mouseState.scroll.deltaY / 16.0f);
+
+
+	mouseLocation.set(
+		(systems::TheGrid()->kToyGrid->width / 2) - (((xCenter - mouseState.x + gRendererOffset.x()) / 32.f) / gGridRenderer.zoomValue),
+		(systems::TheGrid()->kToyGrid->height / 2) - (((yCenter - mouseState.y + gRendererOffset.y()) / 32.f) / gGridRenderer.zoomValue)
+		);
+
+	{
+		const ::hope::input::mouse::ButtonState& bs = mouseState.buttons[::hope::input::mouse::BOUTON_LEFT];
+
+		switch (bs.drag.status) {
+		case hope::input::mouse::DragState::START: {
+			kSelectionStartLocation = mouseLocation;
+			break;
+		}
+		case hope::input::mouse::DragState::END: {
+			kSelectionBox.setX(kSelectionStartLocation.x, mouseLocation.x);
+			kSelectionBox.setY(kSelectionStartLocation.y, mouseLocation.y);
+			applyMouseMode(kMouseMode, kSelectionBox);
+			break;
+		}
+		}
+	}
+}
 
 void Application::onLoop(void) {
 	const ::hope::input::mouse::MouseState& mouseState = ::hope::input::mouse::getMouseState();
@@ -938,129 +1081,21 @@ void Application::onLoop(void) {
 	kAccuTime += elaspsedTime;
 	kUIAccuTime += elaspsedTime;
 
-	bool scrollNotified = false;
+
+	// ---------------------------- INPUT
+
+	bool caught = notifyCanvas(mouseState);
 	
-	// ---------------------------- INPUT UI
-
-	if (mouseState.scroll.deltaX != 0 || mouseState.scroll.deltaY != 0)
-	{
-		hope::ui::event::Scroll::Event e;
-
-		e.deltaX = mouseState.scroll.deltaX;
-		e.deltaY = mouseState.scroll.deltaY;
-
-		scrollNotified = uiCanvas.notify<hope::ui::event::Scroll>(mouseState.x, mouseState.y, e);
-	}
-
-	for (size_t i = 0; i < 256; ++i) {
-		if (mouseState.buttons[i].just_up)
-		{
-			hope::ui::event::Click::Event e;
-			e.x = mouseState.x;
-			e.y = mouseState.y;
-			uiCanvas.notify<hope::ui::event::Click>(mouseState.x, mouseState.y, e);
-		}
-		if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::START)
-		{
-			hope::ui::event::DragStart::Event e;
-
-			e.startX = mouseState.buttons[i].drag.startX;
-			e.startY = mouseState.buttons[i].drag.startY;
-
-			e.deltaX = mouseState.buttons[i].drag.deltaX;
-			e.deltaY = mouseState.buttons[i].drag.deltaY;
-
-			uiCanvas.notify<hope::ui::event::DragStart>(mouseState.x, mouseState.y, e);
-		}
-		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::END)
-		{
-			hope::ui::event::DragEnd::Event e;
-
-			e.startX = mouseState.buttons[i].drag.startX;
-			e.startY = mouseState.buttons[i].drag.startY;
-
-			e.deltaX = mouseState.buttons[i].drag.deltaX;
-			e.deltaY = mouseState.buttons[i].drag.deltaY;
-
-			uiCanvas.notify<hope::ui::event::DragEnd>(e.startX, e.startY, e);
-		}
-		else if (mouseState.buttons[i].drag.status == hope::input::mouse::DragState::MOVE)
-		{
-			hope::ui::event::DragMove::Event e;
-
-			e.startX = mouseState.buttons[i].drag.startX;
-			e.startY = mouseState.buttons[i].drag.startY;
-
-			e.deltaX = mouseState.buttons[i].drag.deltaX;
-			e.deltaY = mouseState.buttons[i].drag.deltaY;
-
-			uiCanvas.notify<hope::ui::event::DragMove>(e.startX, e.startY, e);
-		}
-	}
-
-
-	
-
-	// ---------------------------- INPUT UI
-
-
-	// -------------------------- INPUT
-
-	float_t xCenter = winWidth / 2.0f;
-	float_t yCenter = winHeight / 2.0f;
-
-
-	float xMouse = (mouseState.x - xCenter) / 10.f;
-	float yMouse = (mouseState.y - yCenter) / -10.f;
-
-	mouseLocation.set(
-		(systems::TheGrid()->kToyGrid->width / 2) - (((xCenter - mouseState.x - kRendererOffsetX) / 32.f) / gridRenderer.zoomValue),
-		(systems::TheGrid()->kToyGrid->height / 2) - (((yCenter - mouseState.y - kRendererOffsetY) / 32.f) / gridRenderer.zoomValue)
-		);
-
-
-
-	switch (kDnDView.process(mouseState)) {
-	case hope::input::mouse::DragAndDrop::Status::BEGIN:
-		break;
-	case hope::input::mouse::DragAndDrop::Status::END:
-		gridRenderer.translate(-(kRendererOffsetX + kDnDView.getDeltaX()), -(kRendererOffsetY + kDnDView.getDeltaY()));
-		kRendererOffsetX += kDnDView.getDeltaX();
-		kRendererOffsetY += kDnDView.getDeltaY();
-		break;
-	case hope::input::mouse::DragAndDrop::Status::IN_PROGRESS:
-		gridRenderer.translate(-(kRendererOffsetX + kDnDView.getDeltaX()), -(kRendererOffsetY + kDnDView.getDeltaY()));
-		break;
-	default:
-		break;
-	}
-
-
-	switch (kDnDSelection.process(mouseState)) {
-	case hope::input::mouse::DragAndDrop::Status::BEGIN:
-		kSelectionStartLocation = mouseLocation;
-		break;
-	case hope::input::mouse::DragAndDrop::Status::END:
-		kSelectionBox.setX(kSelectionStartLocation.x, mouseLocation.x);
-		kSelectionBox.setY(kSelectionStartLocation.y, mouseLocation.y);
-		applyMouseMode(kMouseMode, kSelectionBox);
-		break;
-	case hope::input::mouse::DragAndDrop::Status::IN_PROGRESS:
-		break;
-	default:
-		break;
-	}
-
-	if (!scrollNotified) {
-		gridRenderer.zoom((float)mouseState.scroll.deltaY / 16.0f);
+	if (!caught) {
+		notifyGrid(mouseState);
 	}
 
 	// -------------------------- INPUT
 
 	command::dispatch();
-	
+
 	// -------------------------- UPDATE WORLD
-	
+
 
 	while (kAccuTime > 30) {
 		//		updateAgentAliveGauges(store_Alive.pool, store_Alive.pool_cursor);
@@ -1083,14 +1118,14 @@ void Application::onLoop(void) {
 
 
 	//if (uiNeededRender) {
-		ui::Main::Props props;
-		
-		props.storage_id = gStorageId;
+	ui::Main::Props props;
 
-		uiCanvas.render<ui::Main>(props);
+	props.storage_id = gStorageId;
 
-//		uiNeededRender = false;
-//	}
+	uiCanvas.render<ui::Main>(props);
+
+	//		uiNeededRender = false;
+	//	}
 
 	// -------------------------- UPDATE GRID
 	updateRenderer();
@@ -1099,16 +1134,16 @@ void Application::onLoop(void) {
 
 	// ---------------------------- DRAW
 
-//	if (kUIAccuTime > 100) {
-		drawUI();
-		kUIAccuTime = 0;
-//	}
+	//	if (kUIAccuTime > 100) {
+	drawUI();
+	kUIAccuTime = 0;
+	//	}
 
 	glViewport(0, 0, winWidth, winHeight);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	gridRenderer.render();
+	gGridRenderer.render();
 
 	framebuffer.render();
 
@@ -1160,8 +1195,8 @@ void Application::drawUI() {
 				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.status,
 				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaX,
 				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaY
-			);
-			
+				);
+
 
 			nvgStackText("=============");
 
@@ -1226,7 +1261,7 @@ void Application::drawUI() {
 void Application::onResize(int width, int height) {
 	glViewport(0, 0, width, height);
 
-	gridRenderer.resize(width, height);
+	gGridRenderer.resize(width, height);
 	uiCanvas.setSize(width, height);
 }
 
@@ -1246,8 +1281,8 @@ void Application::onGLInitialize() {
 
 	::hope::nanovg::loadFont("Roboto-Regular.ttf", "sans");
 
-	gridRenderer.initialize(systems::TheGrid()->kToyGrid->width, systems::TheGrid()->kToyGrid->height, "tiles.png(webp)", "grid.vert", "grid.frag");
-	gridRenderer.resize(winWidth, winHeight);
+	gGridRenderer.initialize(systems::TheGrid()->kToyGrid->width, systems::TheGrid()->kToyGrid->height, "tiles.png(webp)", "grid.vert", "grid.frag");
+	gGridRenderer.resize(winWidth, winHeight);
 	//	for (auto it = kResources.cells.begin(); it != kResources.cells.end(); ++it) {
 	//		gridRenderer.set(it->second.x, it->second.y, toTileIndex(it->second));
 	//	}
@@ -1255,7 +1290,7 @@ void Application::onGLInitialize() {
 }
 
 void Application::onGLRelease(void) {
-	gridRenderer.release();
+	gGridRenderer.release();
 	::hope::nanovg::release();
 }
 

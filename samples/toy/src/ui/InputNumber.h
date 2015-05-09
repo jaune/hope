@@ -5,9 +5,7 @@
 
 namespace ui {
 	using namespace hope::ui;
-
-
-
+	
 	template <typename T>
 	struct InputNumber {
 

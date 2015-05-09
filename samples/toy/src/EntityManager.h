@@ -1,10 +1,10 @@
 #ifndef HOPE_SAMPLES_TOY_EntityManager_H
 #define HOPE_SAMPLES_TOY_EntityManager_H
 
-#include <stdint.h>
+#include "./types.h"
 
 typedef uint32_t ComponentMask;
-typedef uint32_t EntityId;
+
 #include <map>
 
 class EntityManager {
