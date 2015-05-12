@@ -67,8 +67,12 @@ struct TaskComponent {
 	size_t childrenTotal;
 	size_t childrenDone;
 
+	TaskType type;
+
 	TaskComponent() :
 		label("<unknow>"),
+
+		type(0),
 
 		parent(0),
 		next(0),
@@ -87,7 +91,7 @@ struct TaskComponent {
 struct ConstructionTaskComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 6);
 
-	const hope::samples::toy::fbs::ConstructionRecipe* recipe;
+	const asset::fbs::ConstructionRecipe* recipe;
 };
 
 struct ItemTransfertTaskComponent{
@@ -106,16 +110,6 @@ struct ConstructTaskComponent {
 
 struct DoableComponent{
 	static const ComponentMask COMPONENT_MASK = (1 << 9);
-};
-
-struct AttachToAgentComponent{
-	static const ComponentMask COMPONENT_MASK = (1 << 10);
-
-	EntityId agent;
-
-	AttachToAgentComponent() :
-		agent(0) {
-	}
 };
 
 struct PlanComponent {
@@ -292,7 +286,6 @@ public:
 	REGISTER_COMPONENT(ConstructionTaskComponent)
 	REGISTER_COMPONENT(ItemTransfertTaskComponent)
 	REGISTER_COMPONENT(ConstructTaskComponent)
-	REGISTER_COMPONENT(AttachToAgentComponent)
 	REGISTER_COMPONENT(ExtractTaskComponent)
 	
 	
@@ -315,8 +308,6 @@ public:
 		manager_ItemTransfertTaskComponent.detach(id);
 		manager_ConstructTaskComponent.detach(id);
 
-
-		manager_AttachToAgentComponent.detach(id);
 		manager_DoableComponent.detach(id);
 		manager_PlanComponent.detach(id);
 		manager_DepositComponent.detach(id);

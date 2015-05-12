@@ -1,13 +1,13 @@
 #ifndef HOPE_SAMPLES_TOY_systems_action_ItemPick_H
 #define HOPE_SAMPLES_TOY_systems_action_ItemPick_H
 
-#include "../Entities.h"
+#include "../../Entities.h"
 
 #include <grid/PathCrawler.h>
 #include <console.h>
-#include "../Components.h"
+#include "../../Components.h"
 
-#include "./TheGrid.h"
+#include "../TheGrid.h"
 
 
 class ItemPickActionSystem : public AbstractActionSystem< ItemPickActionComponent > {

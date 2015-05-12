@@ -19,13 +19,13 @@
 #include <grid/Pathfinder.h>
 
 
-#include "./TileIndexTable.h"
+#include "./asset/TileIndexTable.h"
 
 #include <gles2/Framebuffer.h>
 
 
-#include "./ItemTable_generated.h"
-#include "./ConstructionRecipeTable_generated.h"
+#include "./asset/ItemTable_generated.h"
+#include "./asset/ConstructionRecipeTable_generated.h"
 
 #include <functional>
 
@@ -34,9 +34,9 @@
 #include "./systems/TheGrid.h"
 
 #include "./Entities.h"
-#include "./systems/Task.h"
+#include "./task/Task.h"
 #include "./systems/Action.h"
-#include "./systems/task/Construction.h"
+#include "./task/Construction.h"
 
 #include "./systems/Deposit.h"
 
@@ -45,6 +45,8 @@
 
 #include "./ui/Canvas.h"
 #include "./ui/Main.h"
+
+#include "./entity/Location.h"
 
 hope::ui::Canvas uiCanvas(1);
 bool uiNeededRender = true;
@@ -55,7 +57,6 @@ ComponentManager<ItemBagComponent> Components::manager_ItemBagComponent;
 ComponentManager<LocationComponent> Components::manager_LocationComponent;
 ComponentManager<AgentComponent> Components::manager_AgentComponent;
 ComponentManager<StorageComponent> Components::manager_StorageComponent;
-ComponentManager<AttachToAgentComponent> Components::manager_AttachToAgentComponent;
 ComponentManager<DoableComponent> Components::manager_DoableComponent;
 ComponentManager<PlanComponent> Components::manager_PlanComponent;
 ComponentManager<LaborComponent> Components::manager_LaborComponent;
@@ -86,14 +87,6 @@ static hope::ai::plan::NeedType N_EAT;
 static hope::ai::plan::NeedType N_LAZY;
 
 static uint32_t kAccuTime = 0;
-static uint32_t kUIAccuTime = 0;
-
-
-
-
-
-
-
 
 
 enum MouseMode {
@@ -416,6 +409,7 @@ void initializeEntities() {
 
 #include "./command/Command.h"
 
+ui::Main::Props gMainProps;
 
 void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQuantity& command){
 
@@ -429,8 +423,8 @@ void command_StorageSetItemRequestQuantity(const command::StorageSetItemRequestQ
 	uiNeededRender = true;
 }
 
-void command_SetStorageId(const command::SetStorageId& command){
-	gStorageId = command.storage_id;
+void command_SelectEntity(const command::SelectEntity& command){
+	gMainProps.selected_entity_id = command.entity_id;
 
 	uiNeededRender = true;
 }
@@ -448,11 +442,12 @@ void command_AddConstructionTask(const command::AddConstructionTask& command){
 
 
 void Application::onInitialize(void) {
+	gMainProps.selected_entity_id = 0;
 
 	hope::asset::Asset asset_ConstructionRecipeTable = hope::asset::get("ConstructionRecipeTable.json(flatc)");
 	systems::task::Construction.loadConstructionRecipeTable(asset_ConstructionRecipeTable);
 
-	resource::ItemTable::initialize("ItemTable.json(flatc)");
+	asset::ItemTable::initialize("ItemTable.json(flatc)");
 
 	defaultMapping.bind(hope::input::keyboard::KEY_Q, this->createCommad<BeginWallConstructionCommand>());
 	defaultMapping.bind(hope::input::keyboard::KEY_W, this->createCommad<BeginFloorConstructionCommand>());
@@ -464,7 +459,7 @@ void Application::onInitialize(void) {
 
 	command::createMapping();
 	command::bind<command::StorageSetItemRequestQuantity>(command_StorageSetItemRequestQuantity);
-	command::bind<command::SetStorageId>(command_SetStorageId);
+	command::bind<command::SelectEntity>(command_SelectEntity);
 	command::bind<command::AddConstructionTask>(command_AddConstructionTask);
 
 
@@ -833,7 +828,7 @@ void nvgStackTextTaskDetail(EntityId id) {
 	nvgStackText("== items ==");
 	for (auto it = task->recipe->items()->begin(); it != task->recipe->items()->end(); ++it){
 		int32_t quantity = bag->items.getItemQuantity(it->item_id());
-		nvgStackText("%s: %d / %d", resource::ItemTable::get(it->item_id())->label()->c_str(), quantity, it->quantity());
+		nvgStackText("%s: %d / %d", asset::ItemTable::get(it->item_id())->label()->c_str(), quantity, it->quantity());
 	}
 	nvgStackText("=============");
 }
@@ -857,7 +852,7 @@ void StorageComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 
 	for (auto it = c->request_quantities.items.begin(); it != c->request_quantities.items.end(); ++it){
 		int32_t quantity = bag->items.getItemQuantity(it->first);
-		nvgStackText("%s: %d / %d", resource::ItemTable::get(it->first)->label()->c_str(), quantity, it->second);
+		nvgStackText("%s: %d / %d", asset::ItemTable::get(it->first)->label()->c_str(), quantity, it->second);
 	}
 
 	nvgStackText("=============");
@@ -874,7 +869,7 @@ void DepositComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 		return;
 	}
 
-	nvgStackText("==== Deposit \"%s\" #%d ====", resource::ItemTable::get(c->item_id)->label()->c_str(), id);
+	nvgStackText("==== Deposit \"%s\" #%d ====", asset::ItemTable::get(c->item_id)->label()->c_str(), id);
 
 	for (auto it = c->item_quantities.begin(); it != c->item_quantities.end(); ++it){
 		nvgStackText("%d", (*it));
@@ -898,7 +893,7 @@ void ItemBagComponent_stackTextDetail_mouseLocation(const hope::grid::Location& 
 	nvgStackText("==== ItemBag #%d ====", id);
 
 	for (auto it = c->items.items.begin(); it != c->items.items.end(); ++it){
-		nvgStackText("%s: %d", resource::ItemTable::get(it->first)->label()->c_str(), it->second);
+		nvgStackText("%s: %d", asset::ItemTable::get(it->first)->label()->c_str(), it->second);
 	}
 
 	nvgStackText("=============");
@@ -921,12 +916,6 @@ void TaskComponent_stackTask(TaskComponent* c, EntityId id) {
 
 	if (c->childrenTotal > 0) {
 		nvgStackText("   children: %d / %d", c->childrenDone, c->childrenTotal);
-	}
-
-
-	auto ata = Components::find<AttachToAgentComponent>(id);
-	if (ata != NULL) {
-		nvgStackText("   agent: #%d", ata->agent);
 	}
 
 	auto t = Components::find<ConstructionTaskComponent>(id);
@@ -1062,6 +1051,16 @@ void notifyGrid(const ::hope::input::mouse::MouseState& mouseState) {
 		}
 		}
 	}
+	
+	{
+		const ::hope::input::mouse::ButtonState& bs = mouseState.buttons[::hope::input::mouse::BOUTON_LEFT];
+		
+		if (bs.just_up) {
+			command::SelectEntity command;
+			command.entity_id = entity::findAtLocation(mouseLocation);
+			command::trigger(command);
+		}
+	}
 }
 
 void Application::onLoop(void) {
@@ -1079,9 +1078,7 @@ void Application::onLoop(void) {
 	lastTime = currentTime;
 
 	kAccuTime += elaspsedTime;
-	kUIAccuTime += elaspsedTime;
-
-
+	
 	// ---------------------------- INPUT
 
 	bool caught = notifyCanvas(mouseState);
@@ -1089,6 +1086,7 @@ void Application::onLoop(void) {
 	if (!caught) {
 		notifyGrid(mouseState);
 	}
+
 
 	// -------------------------- INPUT
 
@@ -1098,10 +1096,6 @@ void Application::onLoop(void) {
 
 
 	while (kAccuTime > 30) {
-		//		updateAgentAliveGauges(store_Alive.pool, store_Alive.pool_cursor);
-		//		updateAgentAliveNeeds(store_Alive.pool, store_Alive.pool_cursor);
-		//		updateAgentAliveAction(store_Alive.pool, store_Alive.pool_cursor);
-
 		systems::Task.updatePlans();
 
 		systems::Action::cleanup();
@@ -1114,31 +1108,16 @@ void Application::onLoop(void) {
 
 		kAccuTime = 0;
 	}
-	// -------------------------- UPDATE WORLD
+	
+	uiCanvas.render<ui::Main>(gMainProps);
 
-
-	//if (uiNeededRender) {
-	ui::Main::Props props;
-
-	props.storage_id = gStorageId;
-
-	uiCanvas.render<ui::Main>(props);
-
-	//		uiNeededRender = false;
-	//	}
-
-	// -------------------------- UPDATE GRID
 	updateRenderer();
-	// -------------------------- UPDATE GRID
-
+	
 
 	// ---------------------------- DRAW
 
-	//	if (kUIAccuTime > 100) {
 	drawUI();
-	kUIAccuTime = 0;
-	//	}
-
+	
 	glViewport(0, 0, winWidth, winHeight);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -1147,15 +1126,12 @@ void Application::onLoop(void) {
 
 	framebuffer.render();
 
-
-
-
+	drawDebug();
 
 	// ---------------------------- DRAW
 }
 
-
-void Application::drawUI() {
+void Application::drawDebug() {
 	const ::hope::input::mouse::MouseState& mouseState = ::hope::input::mouse::getMouseState();
 
 	int32_t winWidth = 1024, winHeight = 768;
@@ -1164,30 +1140,14 @@ void Application::drawUI() {
 	float_t xCenter = winWidth / 2.0f;
 	float_t yCenter = winHeight / 2.0f;
 
-
-	framebuffer.begin();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	::hope::nanovg::beginFrame();
 	{
-		// ---------------------------- DRAW NANOVG
-		::hope::nanovg::beginFrame();
-
-		auto vg = ::hope::nanovg::getContext();
-
-
-		uiCanvas.draw(vg);
-
-
-		//	nvgDrawAABB(aabb);
-
 		nvgBeginStackTextLeft(); {
 			dumpTasks();
 		}
 
 		nvgBeginStackTextRight(); {
 			nvgStackText("mode: %s", toString((MouseMode)kMouseMode));
-
-			//		nvgStackText("nodes: %d", gPathFinder->nodes.size());
 
 			nvgStackText("%d;%d", mouseLocation.x, mouseLocation.y);
 
@@ -1196,7 +1156,6 @@ void Application::drawUI() {
 				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaX,
 				mouseState.buttons[hope::input::mouse::BOUTON_LEFT].drag.deltaY
 				);
-
 
 			nvgStackText("=============");
 
@@ -1213,14 +1172,12 @@ void Application::drawUI() {
 
 			nvgStackText("Navigation group: %d", systems::TheGrid()->getNavigationGroup(mouseLocation));
 
-
-
 			const ItemCell* icell = systems::TheGrid()->kItemGrid->find(mouseLocation);
 			if (icell != NULL) {
 				nvgStackText("=== items ===");
 
 				for (auto it = icell->items.items.begin(); it != icell->items.items.end(); ++it){
-					nvgStackText("%s: %d", resource::ItemTable::get(it->first)->label()->c_str(), it->second);
+					nvgStackText("%s: %d", asset::ItemTable::get(it->first)->label()->c_str(), it->second);
 				}
 
 				nvgStackText("=============");
@@ -1251,8 +1208,18 @@ void Application::drawUI() {
 
 	}
 	::hope::nanovg::endFrame();
-	framebuffer.end();
+}
 
+void Application::drawUI() {
+	framebuffer.begin();
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	::hope::nanovg::beginFrame();
+	auto vg = ::hope::nanovg::getContext();
+	uiCanvas.draw(vg);
+	::hope::nanovg::endFrame();
+	framebuffer.end();
 
 }
 

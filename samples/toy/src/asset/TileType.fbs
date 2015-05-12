@@ -1,3 +1,5 @@
+namespace asset.fbs;
+
 enum TileType : byte {
   VOID = 0,
   WALL,

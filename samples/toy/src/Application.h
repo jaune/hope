@@ -59,6 +59,8 @@ class Application : public ::hope::entry::Application {
 	void onGLRelease(void);
 	
 	void updateRenderer();
+
+	void drawDebug();
 	void drawUI();
 		
 

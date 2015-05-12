@@ -40,7 +40,6 @@ public:
 	static void findByComponentMask(ComponentMask mask, std::vector<EntityId>& result) {
 		getManager()->findByComponentMask(mask, result);
 	}
-	
 
 	template<class T>
 	static EntityId findFirstWith() {

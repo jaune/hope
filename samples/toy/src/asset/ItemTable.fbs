@@ -1,4 +1,4 @@
-namespace hope.samples.toy.fbs;
+namespace asset.fbs;
 
 table Item {
   id: int;

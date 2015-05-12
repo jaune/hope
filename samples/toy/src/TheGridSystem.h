@@ -7,10 +7,9 @@
 #include "./ItemGrid.h"
 
 #include "./Plan.h"
-#include "./Agent.h"
 #include "./Task.h"
 
-#include "./ItemTable_generated.h"
+#include "./asset/ItemTable_generated.h"
 
 #include "./Entities.h"
 #include "./CellType.h"

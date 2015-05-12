@@ -6,6 +6,7 @@
 #include "./InputNumber.h"
 #include "../command/Command.h"
 
+
 namespace ui {
 	using namespace hope::ui;
 
@@ -15,8 +16,8 @@ namespace ui {
 			EntityId storage_id;
 			ItemId item_id;
 			const char* label;
-			float quantity;
-			float request_quantity;
+			ItemQuantity quantity;
+			ItemQuantity request_quantity;
 		};
 
 		static void render(Canvas* c, ElementId root, const Props& props) {
@@ -26,8 +27,6 @@ namespace ui {
 			style.height = Size::px(15.0f);
 			style.layout.type = Layout::HORIZONTAL;
 			
-
-
 			// label
 			{
 				auto l = c->appendChild(root);

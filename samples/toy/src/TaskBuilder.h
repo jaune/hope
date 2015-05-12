@@ -1,6 +1,10 @@
 #ifndef HOPE_SAMPLES_TOY_TaskBuilder_H
 #define HOPE_SAMPLES_TOY_TaskBuilder_H
 
+#include "task/action/Construct.h"
+#include "task/action/Extract.h"
+#include "task/action/ItemTransfert.h"
+
 class TaskBuilder {
 
 	EntityId createVoidTask(EntityId parent_id) {
@@ -18,6 +22,7 @@ class TaskBuilder {
 		EntityId id = Entities::create();
 
 		auto c = Components::attach<TaskComponent>(id);
+		c->type = task::ACTION_ITEM_TRANSFERT;
 		c->label = "ItemTransfertTask";
 		setParent(c, parent_id);
 
@@ -33,6 +38,7 @@ class TaskBuilder {
 		
 		auto c = Components::attach<TaskComponent>(id);
 		c->label = "AddLaborToTask";
+		c->type = task::ACTION_CONSTRUCT;
 		setParent(c, parent_id);
 		
 		auto altt = Components::attach<ConstructTaskComponent>(id);
@@ -53,7 +59,7 @@ class TaskBuilder {
 public:
 
 
-	EntityId createConstructionTask(const hope::samples::toy::fbs::ConstructionRecipe* recipe, TaskPriority priority, hope::grid::Location& location) {
+	EntityId createConstructionTask(const asset::fbs::ConstructionRecipe* recipe, TaskPriority priority, hope::grid::Location& location) {
 		EntityId id = Entities::create();
 
 		Components::attach<LocationComponent>(id)->position.set(location);

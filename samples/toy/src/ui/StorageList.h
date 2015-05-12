@@ -2,12 +2,11 @@
 #define HOPE_SAMPLES_UI_UI_StorageList_H
 
 #include "./Canvas.h"
-#include "../ItemTable_generated.h"
 
 #include "./StorageListItem.h"
 #include "../Entities.h"
-#include "../resource/ItemTable.h"
-#include "../command/SetStorageId.h"
+#include "../asset/ItemTable.h"
+#include "../command/SelectEntity.h"
 
 namespace ui {
 	using namespace hope::ui;
@@ -68,7 +67,7 @@ namespace ui {
 				const ItemBag& items = Components::get<ItemBagComponent>(props.storage_id)->items;
 				const ItemBag& requests = Components::get<StorageComponent>(props.storage_id)->request_quantities;
 
-				const hope::samples::toy::fbs::ItemTable* table = resource::ItemTable::all();
+				const asset::fbs::ItemTable* table = asset::ItemTable::all();
 
 				size_t i = 0;
 				for (auto it = table->items()->begin(); it != table->items()->end(); ++it) {
@@ -89,8 +88,8 @@ namespace ui {
 		}		
 
 		static void onClick(Canvas* c, ElementId id, const event::Click::Event& e) {
-			command::SetStorageId command;
-			command.storage_id = 0;
+			command::SelectEntity command;
+			command.entity_id = 0;
 			command::trigger(command);
 		}
 

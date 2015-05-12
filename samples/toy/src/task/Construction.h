@@ -2,14 +2,14 @@
 #define HOPE_SAMPLES_TOY_system_task_Construction_H
 
 #include <grid/Grid.h>
-#include "../../ConstructionGrid.h"
-#include "../../ConstructionRecipeTable_generated.h"
-#include "../../TaskBuilder.h"
-#include "../../CellType.h"
-#include "../TheGrid.h"
+#include "../ConstructionGrid.h"
+#include "../asset/ConstructionRecipeTable_generated.h"
+#include "../TaskBuilder.h"
+#include "../CellType.h"
+#include "../systems/TheGrid.h"
 #include <asset/asset.h>
 
-typedef std::unordered_map<int32_t, const hope::samples::toy::fbs::ConstructionRecipe*> ConstructionRecipeTable;
+typedef std::unordered_map<int32_t, const asset::fbs::ConstructionRecipe*> ConstructionRecipeTable;
 
 class ConstructionTaskSystem {
 public:
@@ -33,7 +33,7 @@ public:
 		if (asset.is_null()) {
 			return false;
 		}
-		const hope::samples::toy::fbs::ConstructionRecipeTable* fbs_ConstructionRecipeTable = hope::samples::toy::fbs::GetConstructionRecipeTable(asset.pointer);
+		const asset::fbs::ConstructionRecipeTable* fbs_ConstructionRecipeTable = asset::fbs::GetConstructionRecipeTable(asset.pointer);
 		if (fbs_ConstructionRecipeTable == NULL) {
 			return false;
 		}
@@ -53,7 +53,7 @@ public:
 		return cell->taskId;
 	}
 
-	void beginConstruction(int32_t x, int32_t y, const hope::samples::toy::fbs::ConstructionRecipe* recipe) {
+	void beginConstruction(int32_t x, int32_t y, const asset::fbs::ConstructionRecipe* recipe) {
 		CellType type = systems::TheGrid()->kToyGrid->at(x, y)->type;
 
 		if (!(type == CellType::VOID || type == CellType::WALL)) {

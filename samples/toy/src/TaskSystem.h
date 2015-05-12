@@ -8,23 +8,45 @@
 #include "./TaskBuilder.h"
 
 
-#include "./systems/task/Construct.h"
-#include "./systems/task/ItemTransfert.h"
-#include "./systems/task/Extract.h"
+#include "./task/action/Construct.h"
+#include "./task/action/ItemTransfert.h"
+#include "./task/action/Extract.h"
 
 
 class TaskSystem {
 	std::function<void(AgentComponent*, EntityId)> callback_processLazyAgentComponent;
 
 
-public:
+private:
+	void attachAction(EntityId task_id, EntityId agent_id) {
+		auto task_c = Components::get<TaskComponent>(task_id);
+
+		switch (task_c->type) {
+		case task::ACTION_ITEM_TRANSFERT:
+			task::action::ItemTransfert::attachAction(task_id, agent_id);
+			break;
+		case task::ACTION_EXTRACT:
+			task::action::Extract::attachAction(task_id, agent_id);
+			break;
+		case task::ACTION_CONSTRUCT:
+			task::action::Construct::attachAction(task_id, agent_id);
+			break;
+		}
+	}
+
 public:
 	plan::Network kPlanNetwork;
 
 	void attachAction() {
-		systems::task::ItemTransfert.attachAction();
-		systems::task::Construct.attachAction();
-		systems::task::Extract.attachAction();
+		std::vector<EntityId> result;
+
+		Entities::findByComponentMask(PlanComponent::COMPONENT_MASK, result);
+
+		for (auto it = result.begin(); it != result.end(); ++it){
+			auto plan_c = Components::get<PlanComponent>(*it);
+
+			attachAction(plan_c->tack_id, *it);
+		}
 	}
 
 	void updatePlan(EntityId agent_id){
@@ -38,14 +60,12 @@ public:
 					setTaskDone(plan_c->tack_id);
 					hope::console::log("PLAN ::: SUCCESS task: #%d", plan_c->tack_id);
 					
-					Components::detach<AttachToAgentComponent>(plan_c->tack_id);
 					Components::detach<PlanComponent>(agent_id);
 				}
 			}
 			else if (action_c->status == ActionComponent::Status::FAILURE){
 				hope::console::log("PLAN ::: FAILURE task: #%d", plan_c->tack_id);
 				Components::detach<DoableComponent>(plan_c->tack_id);
-				Components::detach<AttachToAgentComponent>(plan_c->tack_id);
 				Components::detach<PlanComponent>(agent_id);
 			}
 		}
@@ -158,7 +178,6 @@ public:
 		}
 
 		Components::detach<DoableComponent>(task_id);
-		Components::attach<AttachToAgentComponent>(task_id)->agent = agent_id;
 		Components::attach<PlanComponent>(agent_id)->tack_id = task_id;
 	}
 

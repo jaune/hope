@@ -123,7 +123,7 @@ public:
 			return false;
 		}
 
-		const hope::samples::toy::fbs::TileIndexes *indexes = hope::samples::toy::fbs::GetTileIndexes(asset.pointer);
+		const asset::fbs::TileIndexes *indexes = asset::fbs::GetTileIndexes(asset.pointer);
 
 		for (auto it = indexes->indexes4()->begin(); it != indexes->indexes4()->end(); ++it) {
 			set((CellType)it->center(),

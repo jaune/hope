@@ -2,7 +2,7 @@
 #define HOPE_SAMPLES_TOY_ITEMGRID_H
 
 #include <grid/Grid.h>
-#include "./ItemTable_generated.h"
+#include "./asset/ItemTable_generated.h"
 #include "./ItemBag.h"
 
 struct ItemCell {

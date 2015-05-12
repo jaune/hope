@@ -8,7 +8,7 @@ namespace command {
 
 		void(*AddConstructionTask_function)(const AddConstructionTask&);
 		void(*CancelConstructionTask_function)(const CancelConstructionTask&);
-		void(*SetStorageId_function)(const SetStorageId&);
+		void(*SelectEntity_function)(const SelectEntity&);
 		void(*StorageSetItemRequestQuantity_function)(const StorageSetItemRequestQuantity&);
 	};
 
@@ -36,7 +36,7 @@ namespace command {
 
 		mapping.AddConstructionTask_function = NULL;
 		mapping.CancelConstructionTask_function = NULL;
-		mapping.SetStorageId_function = NULL;
+		mapping.SelectEntity_function = NULL;
 		mapping.StorageSetItemRequestQuantity_function = NULL;
 	}
 
@@ -113,21 +113,21 @@ namespace command {
 		gMappings[gActiveMapping - 1].CancelConstructionTask_function = NULL;
 	}
 	template<>
-	void trigger<SetStorageId>(const SetStorageId& command) {
+	void trigger<SelectEntity>(const SelectEntity& command) {
 		command::Command c;
-		c.type = SET_STORAGE_ID;
-		c.SetStorageId = command;
+		c.type = SELECT_ENTITY;
+		c.SelectEntity = command;
 		trigger(c);
 	}
 
 	template <>
-	void bind<SetStorageId>(void(*function)(const SetStorageId&)) {
-		gMappings[gActiveMapping - 1].SetStorageId_function = function;
+	void bind<SelectEntity>(void(*function)(const SelectEntity&)) {
+		gMappings[gActiveMapping - 1].SelectEntity_function = function;
 	}
 
 	template <>
-	void unbind<SetStorageId>() {
-		gMappings[gActiveMapping - 1].SetStorageId_function = NULL;
+	void unbind<SelectEntity>() {
+		gMappings[gActiveMapping - 1].SelectEntity_function = NULL;
 	}
 	template<>
 	void trigger<StorageSetItemRequestQuantity>(const StorageSetItemRequestQuantity& command) {
@@ -173,9 +173,9 @@ namespace command {
 					mapping.CancelConstructionTask_function(command.CancelConstructionTask);
 				}
 				break;
-			case SET_STORAGE_ID:
-				if (mapping.SetStorageId_function != NULL) {
-					mapping.SetStorageId_function(command.SetStorageId);
+			case SELECT_ENTITY:
+				if (mapping.SelectEntity_function != NULL) {
+					mapping.SelectEntity_function(command.SelectEntity);
 				}
 				break;
 			case STORAGE_SET_ITEM_REQUEST_QUANTITY:

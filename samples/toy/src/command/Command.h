@@ -3,7 +3,7 @@
 
 #include "./AddConstructionTask.h"
 #include "./CancelConstructionTask.h"
-#include "./SetStorageId.h"
+#include "./SelectEntity.h"
 #include "./StorageSetItemRequestQuantity.h"
 
 #include <queue>
@@ -19,7 +19,7 @@ namespace command {
 		union {
 			AddConstructionTask AddConstructionTask;
 			CancelConstructionTask CancelConstructionTask;
-			SetStorageId SetStorageId;
+			SelectEntity SelectEntity;
 			StorageSetItemRequestQuantity StorageSetItemRequestQuantity;
 		};
 	};
@@ -57,11 +57,11 @@ namespace command {
 	template<> void bind<CancelConstructionTask>(void(*function)(const CancelConstructionTask&));
 	template<> void unbind<CancelConstructionTask>();
 
-	const CommandType SET_STORAGE_ID = 0x3;
+	const CommandType SELECT_ENTITY = 0x3;
 	
-	template<> void trigger<SetStorageId>(const SetStorageId& command);
-	template<> void bind<SetStorageId>(void(*function)(const SetStorageId&));
-	template<> void unbind<SetStorageId>();
+	template<> void trigger<SelectEntity>(const SelectEntity& command);
+	template<> void bind<SelectEntity>(void(*function)(const SelectEntity&));
+	template<> void unbind<SelectEntity>();
 
 	const CommandType STORAGE_SET_ITEM_REQUEST_QUANTITY = 0x4;
 	

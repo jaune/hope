@@ -1,6 +1,6 @@
 include "TileType.fbs";
 
-namespace hope.samples.toy.fbs;
+namespace asset.fbs;
 
 table ConstructionRecipeItem {
 	quantity: short;
