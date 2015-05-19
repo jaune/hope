@@ -50,20 +50,19 @@ public:
 	}
 
 	void decrementItemQuantity(ItemId item_id) {
-		ItemQuantity q = getItemQuantity(item_id);
-
-		if (q > 0) {
-			setItemQuantity(item_id, q - 1);
-		}
+		addItemQuantity(item_id, -1);
 	}
 	
 	void incrementItemQuantity(ItemId item_id) {
-		ItemQuantity q = getItemQuantity(item_id);
-
-		setItemQuantity(item_id, q + 1);
+		addItemQuantity(item_id, 1);
 	}
 
+	void addItemQuantity(ItemId item_id, ItemQuantity q) {
+		setItemQuantity(item_id, getItemQuantity(item_id) + q);
+	}
 
+	
+	
 };
 
 

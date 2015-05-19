@@ -30,7 +30,7 @@ namespace task {
 				}
 
 				if (ItemTransfert->from_id == 0) {
-					ItemTransfert->from_id = Entities::findNearestStoreFromAgent(agent_id);
+					ItemTransfert->from_id = Entities::findNearestStorageFromAgent(agent_id);
 				}
 
 				switch (Plan->step)

@@ -6,6 +6,7 @@
 typedef uint32_t ComponentMask;
 
 #include <map>
+#include <unordered_map>
 
 class EntityManager {
 

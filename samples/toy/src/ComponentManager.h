@@ -1,9 +1,9 @@
 #ifndef HOPE_SAMPLES_TOY_ComponentManager_H
 #define HOPE_SAMPLES_TOY_ComponentManager_H
 
-#include "EntityManager.h"
-
-
+#include "Entities.h"
+#include <functional>
+#include <cassert>
 
 template <class T>
 class ComponentManager {

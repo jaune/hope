@@ -24,12 +24,12 @@
 #include <gles2/Framebuffer.h>
 
 
-#include "./asset/ItemTable_generated.h"
+#include "./asset/ItemTable.h"
+#include "./asset/MachineTable.h"
+#include "./asset/CraftRecipeTable.h"
 #include "./asset/ConstructionRecipeTable_generated.h"
 
 #include <functional>
-
-#include "./Task.h"
 
 #include "./systems/TheGrid.h"
 
@@ -38,15 +38,15 @@
 #include "./systems/Action.h"
 #include "./task/Construction.h"
 
-#include "./systems/Deposit.h"
-
-#include "./factories/storage.h"
-#include "./factories/agent.h"
+#include "./logic/deposit.h"
+#include "./logic/machine.h"
+#include "./logic/agent.h"
+#include "./logic/location.h"
 
 #include "./ui/Canvas.h"
 #include "./ui/Main.h"
 
-#include "./entity/Location.h"
+
 
 hope::ui::Canvas uiCanvas(1);
 bool uiNeededRender = true;
@@ -76,9 +76,8 @@ ComponentManager<ItemPickActionComponent> Components::manager_ItemPickActionComp
 ComponentManager<ConstructActionComponent> Components::manager_ConstructActionComponent;
 ComponentManager<ItemGiveActionComponent> Components::manager_ItemGiveActionComponent;
 
-
-
-
+ComponentManager<MachineComponent> Components::manager_MachineComponent;
+ComponentManager<TileIndexComponent> Components::manager_TileIndexComponent;
 
 
 static hope::ai::plan::NeedType N_SLEEP;
@@ -349,17 +348,15 @@ void initializeEntities() {
 	// explodeEntity_ConstructionTask(*TheGrid::kTaskPool, 69);
 	// TheGrid::kTaskPool->sortHeadersByLevelAndPriority();
 
-	factories::agent::create("Adrien", hope::grid::Location(20, 20));
-	factories::agent::create("Bernard", hope::grid::Location(22, 22));
-	factories::agent::create("Alan", hope::grid::Location(23, 23));
-	factories::agent::create("Axel", hope::grid::Location(23, 20));
-	factories::agent::create("Louis", hope::grid::Location(23, 21));
+	logic::agent::create("Adrien", hope::grid::Location(20, 20));
+	logic::agent::create("Bernard", hope::grid::Location(22, 22));
+	logic::agent::create("Alan", hope::grid::Location(23, 23));
+	logic::agent::create("Axel", hope::grid::Location(23, 20));
+	logic::agent::create("Louis", hope::grid::Location(23, 21));
 
-
-	EntityId id_RawIron;
 
 	{
-		EntityId id = factories::storage::create(hope::grid::Location(35, 35));
+		EntityId id = logic::storage::create(hope::grid::Location(35, 35));
 
 		ItemBag& items = Components::get<ItemBagComponent>(id)->items;
 		items.setItemQuantity(849867, 10000);
@@ -367,11 +364,11 @@ void initializeEntities() {
 
 		ItemBag& requests = Components::get<StorageComponent>(id)->request_quantities;
 
-		requests.setItemQuantity(987546, 500); // "Raw Carbon"
-		requests.setItemQuantity(798265, 500); // "Raw Water"
-		requests.setItemQuantity(952366, 500); // "Raw Iron"
-		requests.setItemQuantity(9654, 500); // "Raw Aluminum"
-		requests.setItemQuantity(982, 500); // "Raw Gold"
+		requests.setItemQuantity(987546, 30); // "Raw Carbon"
+		requests.setItemQuantity(798265, 30); // "Raw Water"
+		requests.setItemQuantity(952366, 30); // "Raw Iron"
+		requests.setItemQuantity(9654, 30); // "Raw Aluminum"
+		requests.setItemQuantity(982, 30); // "Raw Gold"
 
 		gStorageId = id;
 
@@ -379,23 +376,44 @@ void initializeEntities() {
 	}
 
 	{
-		EntityId id = systems::Deposit.create(hope::grid::Location(60, 40), 987546);; // Raw Carbon
+		EntityId id = logic::deposit::create(hope::grid::Location(60, 40), 987546);; // Raw Carbon
 
 		auto &q = Components::get<DepositComponent>(id)->item_quantities;
 		q.push_back(1000);
 	}
 
 	{
-		EntityId id = systems::Deposit.create(hope::grid::Location(60, 20), 952366); // Raw Iron
+		EntityId id = logic::deposit::create(hope::grid::Location(60, 30), 7895); // Fuel
 
 		auto &q = Components::get<DepositComponent>(id)->item_quantities;
 		q.push_back(1000);
-
-		id_RawIron = id;
 	}
 
 	{
-		EntityId id = factories::agent::create("Guillaume", hope::grid::Location(19, 19));
+		EntityId id = logic::deposit::create(hope::grid::Location(60, 20), 952366); // Raw Iron
+
+		auto &q = Components::get<DepositComponent>(id)->item_quantities;
+		q.push_back(1000);
+	}
+
+
+	{
+		EntityId id = logic::machine::create(hope::grid::Location(55, 20), 1, (5 * 16) + 2); // Furnace
+
+		auto c = Components::get<MachineComponent>(id);
+		
+		c->input.setItemQuantity(7895, 1000); // Fuel
+		c->input.setItemQuantity(987546, 1000); // Raw Carbon
+		c->input.setItemQuantity(952366, 1000); // Raw Iron
+	}
+
+	{
+		EntityId id = logic::machine::create(hope::grid::Location(45, 20), 2, (5 * 16) + 3); // Metallurgy Machine
+	}
+
+
+	{
+		EntityId id = logic::agent::create("Guillaume", hope::grid::Location(19, 19));
 
 		/*
 		Components::attach<ActionComponent>(id);
@@ -438,7 +456,12 @@ void command_AddConstructionTask(const command::AddConstructionTask& command){
 	}
 }
 
+void command_MachineSelectRecipe(const command::MachineSelectRecipe& command){
+	auto machine = Components::get<MachineComponent>(command.machine_id);
 
+	machine->recipe_id = command.recipe_id;
+	machine->duration = 0;
+}
 
 
 void Application::onInitialize(void) {
@@ -448,6 +471,9 @@ void Application::onInitialize(void) {
 	systems::task::Construction.loadConstructionRecipeTable(asset_ConstructionRecipeTable);
 
 	asset::ItemTable::initialize("ItemTable.json(flatc)");
+
+	asset::MachineTable::initialize("MachineTable.json(flatc)");
+	asset::CraftRecipeTable::initialize("CraftRecipeTable.json(flatc)");
 
 	defaultMapping.bind(hope::input::keyboard::KEY_Q, this->createCommad<BeginWallConstructionCommand>());
 	defaultMapping.bind(hope::input::keyboard::KEY_W, this->createCommad<BeginFloorConstructionCommand>());
@@ -461,6 +487,7 @@ void Application::onInitialize(void) {
 	command::bind<command::StorageSetItemRequestQuantity>(command_StorageSetItemRequestQuantity);
 	command::bind<command::SelectEntity>(command_SelectEntity);
 	command::bind<command::AddConstructionTask>(command_AddConstructionTask);
+	command::bind<command::MachineSelectRecipe>(command_MachineSelectRecipe);
 
 
 	initializeGrid();
@@ -659,19 +686,6 @@ void DepositComponent_foreach_updateRenderer(TileRenderer& gridRenderer, Deposit
 }
 
 
-void AgentComponent_foreach_updateRenderer(TileRenderer& gridRenderer, AgentComponent* agent_c, EntityId agent_id) {
-	auto location = Components::get<LocationComponent>(agent_id);
-
-	gridRenderer.set(location->position.x, location->position.y, 253);
-}
-
-
-void StoreComponent_foreach_updateRenderer(TileRenderer& gridRenderer, StorageComponent* agent_c, EntityId agent_id) {
-	auto location = Components::get<LocationComponent>(agent_id);
-
-	gridRenderer.set(location->position.x, location->position.y, (4 * 16) + 12);
-}
-
 void ConstructionTaskComponent_foreach_updateRenderer(TileRenderer& gridRenderer, ConstructionTaskComponent* ctc, EntityId task_id) {
 	auto location = Components::get<LocationComponent>(task_id);
 
@@ -765,22 +779,24 @@ void Application::updateRenderer() {
 		}
 	}
 
-
-
 	std::function <void(ConstructionTaskComponent*, EntityId)> f0 = std::bind(ConstructionTaskComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<ConstructionTaskComponent>(f0);
 
-	std::function <void(StorageComponent*, EntityId)> f2 = std::bind(StoreComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
-	Components::foreach<StorageComponent>(f2);
+	{
+		std::vector<EntityId> result;
 
+		Entities::findByComponentMask(LocationComponent::COMPONENT_MASK | TileIndexComponent::COMPONENT_MASK, result);
 
-	std::function <void(AgentComponent*, EntityId)> f1 = std::bind(AgentComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
-	Components::foreach<AgentComponent>(f1);
+		for (auto it = result.begin(); it != result.end(); ++it){
+			auto location = Components::get<LocationComponent>(*it);
+			auto tile = Components::get<TileIndexComponent>(*it);
+
+			gGridRenderer.set(location->position.x, location->position.y, tile->index);
+		}
+	}
 
 	std::function <void(DepositComponent*, EntityId)> f3 = std::bind(DepositComponent_foreach_updateRenderer, gGridRenderer, std::placeholders::_1, std::placeholders::_2);
 	Components::foreach<DepositComponent>(f3);
-
-
 
 	gGridRenderer.commit();
 }
@@ -833,6 +849,38 @@ void nvgStackTextTaskDetail(EntityId id) {
 	nvgStackText("=============");
 }
 
+
+void MachineComponent_stackTextDetail_mouseLocation(const hope::grid::Location& mouseLocation, MachineComponent* c, EntityId id) {
+	auto loc = Components::find<LocationComponent>(id);
+
+	if (loc == NULL) {
+		return;
+	}
+
+	if (loc->position != mouseLocation){
+		return;
+	}
+
+	nvgStackText("==== Machine #%d ====", id);
+
+	if (c->recipe_id != 0){
+		nvgStackText("recipe: %s", asset::CraftRecipeTable::get(c->recipe_id)->label()->c_str());
+	}
+
+	nvgStackText("==== input ====");
+	for (auto it = c->input.items.begin(); it != c->input.items.end(); ++it){
+		int32_t quantity = c->input.getItemQuantity(it->first);
+		nvgStackText("%s: %d", asset::ItemTable::get(it->first)->label()->c_str(), quantity);
+	}
+
+	nvgStackText("==== output ====");
+	for (auto it = c->output.items.begin(); it != c->output.items.end(); ++it){
+		int32_t quantity = c->output.getItemQuantity(it->first);
+		nvgStackText("%s: %d", asset::ItemTable::get(it->first)->label()->c_str(), quantity);
+	}
+
+	nvgStackText("=============");
+}
 
 void StorageComponent_stackTextDetail_mouseLocation(const hope::grid::Location& mouseLocation, StorageComponent* c, EntityId id) {
 	auto loc = Components::find<LocationComponent>(id);
@@ -1057,10 +1105,27 @@ void notifyGrid(const ::hope::input::mouse::MouseState& mouseState) {
 		
 		if (bs.just_up) {
 			command::SelectEntity command;
-			command.entity_id = entity::findAtLocation(mouseLocation);
+			command.entity_id = logic::location::findAtLocation(mouseLocation);
 			command::trigger(command);
 		}
 	}
+}
+
+#include "./logic/plan.h"
+
+void simulate(){
+
+	systems::Task.updatePlan();
+
+	systems::Action::cleanup();
+
+	systems::Task.assignTaskToLazy();
+
+	logic::plan::attachAction();
+
+	systems::Action::process();
+
+	logic::machine::craft();
 }
 
 void Application::onLoop(void) {
@@ -1096,15 +1161,8 @@ void Application::onLoop(void) {
 
 
 	while (kAccuTime > 30) {
-		systems::Task.updatePlans();
+		simulate();
 
-		systems::Action::cleanup();
-
-		systems::Task.assignTaskToLazy();
-
-		systems::Task.attachAction();
-
-		systems::Action::process();
 
 		kAccuTime = 0;
 	}
@@ -1197,6 +1255,9 @@ void Application::drawDebug() {
 
 			std::function<void(StorageComponent*, EntityId)> f2 = std::bind(StorageComponent_stackTextDetail_mouseLocation, mouseLocation, std::placeholders::_1, std::placeholders::_2);
 			Components::foreach<StorageComponent>(f2);
+
+			std::function<void(MachineComponent*, EntityId)> f3 = std::bind(MachineComponent_stackTextDetail_mouseLocation, mouseLocation, std::placeholders::_1, std::placeholders::_2);
+			Components::foreach<MachineComponent>(f3);
 		}
 
 		nvgDrawMenuText(xCenter - 150, winHeight - 40, "a", "WALL", kMouseMode == MOUSE_MODE_WALL);

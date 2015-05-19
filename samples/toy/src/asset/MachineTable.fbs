@@ -1,0 +1,13 @@
+namespace asset.fbs;
+
+table Machine {
+  id: int;
+  label: string;
+  recipes: [int];
+}
+
+table MachineTable {
+  machines: [Machine];
+}
+
+root_type MachineTable;

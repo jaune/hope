@@ -2,6 +2,8 @@
 #define HOPE_GRID_LOCATION_H
 
 #include <cstdint>
+#include <cmath>
+#include <functional>
 
 namespace hope {
 namespace grid {

@@ -23,25 +23,48 @@
 
         'src/TileRenderer.h',
 
-        'src/Task.h',
         'src/Plan.h',
         'src/CellType.h',
         
 
         'src/NavigationGrid.h',
 
+        'src/logic/storage.h',
+        
+        'src/logic/plan.h',
+        'src/logic/plan.cpp',
+        'src/logic/plan/extract.h',
+        'src/logic/plan/extract.cpp',
+        'src/logic/plan/store.h',
+        'src/logic/plan/store.cpp',
+
+        'src/logic/machine.h',
+        'src/logic/agent.h',
+        'src/logic/deposit.h',
+        'src/logic/deposit.cpp',
+
+        'src/logic/location.h',
+        'src/logic/location.cpp',
         
 
         'src/systems/TheGrid.h',
-        'src/systems/Deposit.h',
+        'src/systems/TheGrid.cpp',
 
         'src/systems/Action.h',
         'src/systems/action/AbstractActionSystem.h',
         'src/systems/action/ItemPick.h',
+        'src/systems/action/ItemPick.cpp',
         'src/systems/action/ItemGive.h',
+        'src/systems/action/ItemGive.cpp',
         'src/systems/action/Construct.h',
+        'src/systems/action/Construct.cpp',
         'src/systems/action/Extract.h',
+        'src/systems/action/Extract.cpp',
         'src/systems/action/GoToAdjacent.h',
+        'src/systems/action/GoToAdjacent.cpp',
+
+
+        
 
 
         'src/task/Task.h',
@@ -56,7 +79,7 @@
         'src/ui/InputNumber.h',
         'src/ui/StorageList.h',
         'src/ui/StorageListItem.h',
-
+        'src/ui/MachinePanel.h',
 
 
         'src/command/Command.h',
@@ -73,9 +96,16 @@
         'src/asset/TileIndexes_generated.h',
         'src/asset/ConstructionRecipeTable_generated.h',
 
+        'src/asset/CraftRecipeTable.h',
+        'src/asset/CraftRecipeTable_generated.h',
+
+        'src/asset/MachineTable.h',
+        'src/asset/MachineTable_generated.h',
+
+        
+
 
         'src/TheGridSystem.h',
-        'src/TaskSystem.h',
 
         'src/TaskBuilder.h',
         
@@ -88,8 +118,11 @@
         
         'src/EntityManager.h',
         'src/Entities.h',
+        'src/Entities.cpp',
         'src/ValueArray.h',
         
+        'src/types.h',
+
 
         'src/ToyGrid.h',
         

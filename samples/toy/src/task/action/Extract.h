@@ -4,7 +4,7 @@
 #include "../../systems/action/GoToAdjacent.h"
 #include "../../systems/action/Extract.h"
 #include "../../systems/action/ItemGive.h"
-#include "../../systems/Deposit.h"
+#include "../../logic/deposit.h"
 
 namespace task {
 
@@ -28,7 +28,7 @@ namespace task {
 				}
 
 				if (Task->from_id == 0) {
-					Task->from_id = systems::Deposit.findNearest(Task->item_id, Task->to_id);
+					Task->from_id = logic::deposit::findNearest(Task->item_id, Task->to_id);
 				}
 
 				Task->from_level = 0;

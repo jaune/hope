@@ -6,8 +6,7 @@
 #include <grid/PathCrawler.h>
 #include <console.h>
 #include "../../Components.h"
-
-#include "../TheGrid.h"
+#include "./AbstractActionSystem.h"
 
 
 class ItemPickActionSystem : public AbstractActionSystem< ItemPickActionComponent > {
@@ -15,48 +14,20 @@ class ItemPickActionSystem : public AbstractActionSystem< ItemPickActionComponen
 	
 
 public:
-	ItemPickActionSystem() :
-		processComponent_callback(std::bind(&ItemPickActionSystem::processComponent, this, std::placeholders::_1, std::placeholders::_2)) {
-	}
+	ItemPickActionSystem();
 
-	void process() {
-		Components::foreach<ItemPickActionComponent>(processComponent_callback);
-	}
+	void process();
 
-	void processComponent(ItemPickActionComponent* dataItemTransfert, EntityId to_id) {
-		auto dataAction = Components::get<ActionComponent>(to_id);
+	void processComponent(ItemPickActionComponent* dataItemTransfert, EntityId to_id);
 
-		ItemId item_id = dataItemTransfert->item_id;
-		auto fromBagComponent = Components::get<ItemBagComponent>(dataItemTransfert->from_id);
-		auto toBagComponent = Components::get<ItemBagComponent>(to_id);
-	
-		if (fromBagComponent->items.getItemQuantity(item_id) < 1){
-			hope::console::log("action ::: FAILURE (%s: %d)", __FILE__, __LINE__);
-			dataAction->status = ActionComponent::Status::FAILURE;
-			return;
-		}
-
-		fromBagComponent->items.decrementItemQuantity(item_id);
-		toBagComponent->items.incrementItemQuantity(item_id);
-
-		hope::console::log("action ::: SUCCESS (%s: %d)", __FILE__, __LINE__);
-		dataAction->status = ActionComponent::Status::SUCCESS;
-	}
-
-	void attachTo(EntityId agent_id, ItemId item_id, EntityId to_id) {
-		Components::attach<ActionComponent>(agent_id);
-		auto Action = Components::attach<ItemPickActionComponent>(agent_id);
-
-		Action->item_id = item_id;
-		Action->from_id = to_id;
-	}
+	void attachTo(EntityId agent_id, ItemId item_id, EntityId to_id);
 };
 
 
 namespace systems {
 namespace action {
 
-	ItemPickActionSystem ItemPick;
+	static ItemPickActionSystem ItemPick;
 
 }
 }

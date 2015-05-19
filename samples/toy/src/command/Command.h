@@ -3,6 +3,7 @@
 
 #include "./AddConstructionTask.h"
 #include "./CancelConstructionTask.h"
+#include "./MachineSelectRecipe.h"
 #include "./SelectEntity.h"
 #include "./StorageSetItemRequestQuantity.h"
 
@@ -19,6 +20,7 @@ namespace command {
 		union {
 			AddConstructionTask AddConstructionTask;
 			CancelConstructionTask CancelConstructionTask;
+			MachineSelectRecipe MachineSelectRecipe;
 			SelectEntity SelectEntity;
 			StorageSetItemRequestQuantity StorageSetItemRequestQuantity;
 		};
@@ -57,13 +59,19 @@ namespace command {
 	template<> void bind<CancelConstructionTask>(void(*function)(const CancelConstructionTask&));
 	template<> void unbind<CancelConstructionTask>();
 
-	const CommandType SELECT_ENTITY = 0x3;
+	const CommandType MACHINE_SELECT_RECIPE = 0x3;
+	
+	template<> void trigger<MachineSelectRecipe>(const MachineSelectRecipe& command);
+	template<> void bind<MachineSelectRecipe>(void(*function)(const MachineSelectRecipe&));
+	template<> void unbind<MachineSelectRecipe>();
+
+	const CommandType SELECT_ENTITY = 0x4;
 	
 	template<> void trigger<SelectEntity>(const SelectEntity& command);
 	template<> void bind<SelectEntity>(void(*function)(const SelectEntity&));
 	template<> void unbind<SelectEntity>();
 
-	const CommandType STORAGE_SET_ITEM_REQUEST_QUANTITY = 0x4;
+	const CommandType STORAGE_SET_ITEM_REQUEST_QUANTITY = 0x5;
 	
 	template<> void trigger<StorageSetItemRequestQuantity>(const StorageSetItemRequestQuantity& command);
 	template<> void bind<StorageSetItemRequestQuantity>(void(*function)(const StorageSetItemRequestQuantity&));

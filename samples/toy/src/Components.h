@@ -3,7 +3,11 @@
 
 #include "./ComponentManager.h"
 #include "./ItemBag.h"
-#include "./Task.h"
+#include <grid/PathCrawler.h>
+
+#include "asset/ConstructionRecipeTable_generated.h"
+#include "./logic/plan.h"
+
 
 typedef int LaborQuantity;
 
@@ -22,6 +26,8 @@ struct LocationComponent {
 
 	hope::grid::Location position;
 };
+
+
 
 struct ItemBagComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 2);
@@ -48,9 +54,10 @@ struct StorageComponent {
 	ItemQuantity max;
 
 	StorageComponent() : max(0) {
-
 	}
 };
+
+
 
 struct TaskComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 5);
@@ -88,6 +95,7 @@ struct TaskComponent {
 
 
 
+
 struct ConstructionTaskComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 6);
 
@@ -112,14 +120,31 @@ struct DoableComponent{
 	static const ComponentMask COMPONENT_MASK = (1 << 9);
 };
 
+
+
+
+
 struct PlanComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 11);
 
 	typedef int16_t StepIndex;
 
+	enum Status {
+		NONE = 0,
+		IN_PROGRESS,
+		FAILURE,
+		SUCCESS
+	};
+
+	Status status;
 	StepIndex step;
 	StepIndex size;
-	EntityId tack_id;
+	EntityId task_id;
+
+	PlanType type;
+
+	
+	logic::plan::Options options;
 
 	PlanComponent() :
 		step(0),
@@ -206,8 +231,6 @@ struct ItemPickActionComponent {
 	EntityId from_id;
 };
 
-
-
 struct ConstructActionComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 18);
 
@@ -222,13 +245,36 @@ struct ItemGiveActionComponent {
 };
 
 struct ExtractTaskComponent {
-	static const ComponentMask COMPONENT_MASK = (1 << 19);
+	static const ComponentMask COMPONENT_MASK = (1 << 20);
 
 	ItemId item_id;
 	EntityId to_id;
 	EntityId from_id;
 	DepositLevel from_level;
 };
+
+
+struct MachineComponent {
+	static const ComponentMask COMPONENT_MASK = (1 << 21);
+
+	MachineType type;
+	CraftRecipeId recipe_id;
+
+	CraftDuration duration;
+	ItemBag input;
+	ItemBag inner;
+	ItemBag output;
+
+	ItemQuantity input_max;
+	ItemQuantity output_max;
+};
+
+struct TileIndexComponent{
+	static const ComponentMask COMPONENT_MASK = (1 << 22);
+
+	TileIndex index;
+};
+
 
 
 #define REGISTER_COMPONENT(COMPONENT_CLASS) \
@@ -295,6 +341,10 @@ public:
 	REGISTER_COMPONENT(ConstructActionComponent)
 	REGISTER_COMPONENT(ItemPickActionComponent)
 	REGISTER_COMPONENT(ItemGiveActionComponent)
+
+	REGISTER_COMPONENT(MachineComponent)
+	REGISTER_COMPONENT(TileIndexComponent)
+	
 
 	static void detachAll(EntityId id){
 		manager_GoToComponent.detach(id);

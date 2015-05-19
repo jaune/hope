@@ -8,6 +8,7 @@ namespace command {
 
 		void(*AddConstructionTask_function)(const AddConstructionTask&);
 		void(*CancelConstructionTask_function)(const CancelConstructionTask&);
+		void(*MachineSelectRecipe_function)(const MachineSelectRecipe&);
 		void(*SelectEntity_function)(const SelectEntity&);
 		void(*StorageSetItemRequestQuantity_function)(const StorageSetItemRequestQuantity&);
 	};
@@ -36,6 +37,7 @@ namespace command {
 
 		mapping.AddConstructionTask_function = NULL;
 		mapping.CancelConstructionTask_function = NULL;
+		mapping.MachineSelectRecipe_function = NULL;
 		mapping.SelectEntity_function = NULL;
 		mapping.StorageSetItemRequestQuantity_function = NULL;
 	}
@@ -113,6 +115,23 @@ namespace command {
 		gMappings[gActiveMapping - 1].CancelConstructionTask_function = NULL;
 	}
 	template<>
+	void trigger<MachineSelectRecipe>(const MachineSelectRecipe& command) {
+		command::Command c;
+		c.type = MACHINE_SELECT_RECIPE;
+		c.MachineSelectRecipe = command;
+		trigger(c);
+	}
+
+	template <>
+	void bind<MachineSelectRecipe>(void(*function)(const MachineSelectRecipe&)) {
+		gMappings[gActiveMapping - 1].MachineSelectRecipe_function = function;
+	}
+
+	template <>
+	void unbind<MachineSelectRecipe>() {
+		gMappings[gActiveMapping - 1].MachineSelectRecipe_function = NULL;
+	}
+	template<>
 	void trigger<SelectEntity>(const SelectEntity& command) {
 		command::Command c;
 		c.type = SELECT_ENTITY;
@@ -171,6 +190,11 @@ namespace command {
 			case CANCEL_CONSTRUCTION_TASK:
 				if (mapping.CancelConstructionTask_function != NULL) {
 					mapping.CancelConstructionTask_function(command.CancelConstructionTask);
+				}
+				break;
+			case MACHINE_SELECT_RECIPE:
+				if (mapping.MachineSelectRecipe_function != NULL) {
+					mapping.MachineSelectRecipe_function(command.MachineSelectRecipe);
 				}
 				break;
 			case SELECT_ENTITY:

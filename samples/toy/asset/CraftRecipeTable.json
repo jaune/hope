@@ -1,0 +1,52 @@
+{
+	"recipes": [
+		{
+			"id": 1,
+			"label": "Steal Bar",
+			"duration": 3,
+			"input": [
+				{ "item_id": 952366, "quantity": 1 },
+				{ "item_id": 987546, "quantity": 1 },
+				{ "item_id": 7895, "quantity": 1 }
+			],
+			"output": [
+				{ "item_id": 9854, "quantity": 2 },
+			]
+		},
+		{
+			"id": 2,
+			"label": "Iron bar",
+			"duration": 3,
+			"input": [
+				{ "item_id": 952366, "quantity": 1 },
+				{ "item_id": 7895, "quantity": 1 }
+			],
+			"output": [
+				{ "item_id": 9854, "quantity": 1 },
+			]
+		},
+
+		{
+			"id": 3,
+			"label": "Steel Beam",
+			"duration": 2,
+			"input": [
+				{ "item_id": 9854, "quantity": 2 }
+			],
+			"output": [
+				{ "item_id": 728974, "quantity": 1 },
+			]
+		},
+		{
+			"id": 4,
+			"label": "Steel Plate",
+			"duration": 2,
+			"input": [
+				{ "item_id": 9854, "quantity": 2 }
+			],
+			"output": [
+				{ "item_id": 849867, "quantity": 1 },
+			]
+		},
+	]
+}

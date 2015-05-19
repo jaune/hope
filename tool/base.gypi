@@ -5,6 +5,9 @@
       'Base': {
         "abstract": 1,
         'msvs_settings': {
+          'VCCLCompilerTool': {
+            'ObjectFile': '$(IntDir)/%(RelativeDir)/',
+          },
           'VCLinkerTool': {
             'SubSystem': '2', # 1: Console, 2: Windows
             'LinkTimeCodeGeneration': 1,

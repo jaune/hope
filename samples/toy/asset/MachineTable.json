@@ -1,0 +1,14 @@
+{
+	"machines": [
+		{
+			"id": 1,
+			"label": "Furnace",
+			"recipes": [1, 2]
+		},
+		{
+			"id": 2,
+			"label": "Metallurgy Machine",
+			"recipes": [3, 4]
+		},
+	]
+}

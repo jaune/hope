@@ -180,9 +180,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.828427"
-     inkscape:cx="49.381823"
-     inkscape:cy="472.41545"
+     inkscape:zoom="5.656854"
+     inkscape:cx="51.932746"
+     inkscape:cy="351.87903"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -2992,5 +2992,67 @@
        height="32"
        x="128"
        y="540.36218" />
+    <g
+       id="g4536"
+       transform="matrix(1.1538462,0,0,1.1538458,-39.384617,-110.20931)">
+      <circle
+         r="13.866667"
+         cy="716.36218"
+         cx="48"
+         id="path4526"
+         style="fill:#68c0ff;fill-opacity:1;stroke:none;stroke-width:4.26666641;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <flowRoot
+         transform="matrix(2.5016511,0,0,2.5016511,-60.152436,279.7699)"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="flowRoot4528"
+         xml:space="preserve"><flowRegion
+           id="flowRegion4530"><rect
+             y="167.81577"
+             x="39.774757"
+             height="17.854446"
+             width="15.202797"
+             id="rect4532" /></flowRegion><flowPara
+           id="flowPara4534">S</flowPara></flowRoot>    </g>
+    <g
+       transform="matrix(1.1538461,0,0,1.1538454,24.615388,-110.20907)"
+       id="g4536-0">
+      <circle
+         r="13.866667"
+         cy="716.36218"
+         cx="48"
+         id="path4526-8"
+         style="fill:#ff6868;fill-opacity:1;stroke:none;stroke-width:4.26666641;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <flowRoot
+         transform="matrix(2.5016511,0,0,2.5016511,-59.755445,279.7699)"
+         style="font-style:normal;font-weight:normal;font-size:10px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="flowRoot4528-0"
+         xml:space="preserve"><flowRegion
+           id="flowRegion4530-7"><rect
+             y="167.81577"
+             x="39.774757"
+             height="17.854446"
+             width="15.202797"
+             id="rect4532-2" /></flowRegion><flowPara
+           id="flowPara4534-7">F</flowPara></flowRoot>    </g>
+    <g
+       transform="matrix(1.1538462,0,0,1.1538452,56.615384,-110.20891)"
+       id="g4536-0-5">
+      <circle
+         cy="716.36218"
+         cx="48"
+         id="path4526-8-2"
+         style="fill:#ffea68;fill-opacity:1;stroke:none;stroke-width:4.26666641;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         r="13.866667" />
+      <flowRoot
+         style="font-style:normal;font-weight:normal;font-size:25.01651192px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="flowRoot4528-0-3"
+         xml:space="preserve"><flowRegion
+           id="flowRegion4530-7-0"><rect
+             y="699.58636"
+             x="37.456791"
+             height="44.665596"
+             width="38.032093"
+             id="rect4532-2-4" /></flowRegion><flowPara
+           id="flowPara4534-7-6">M</flowPara></flowRoot>    </g>
   </g>
 </svg>

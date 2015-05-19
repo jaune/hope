@@ -8,13 +8,25 @@
 	"ConstructionRecipeTable.json$": {
 		"transform": {
 			"type": "flatc",
-			"schema": "../src/ConstructionRecipeTable.fbs"
+			"schema": "../src/asset/ConstructionRecipeTable.fbs"
+		}
+	},
+	"CraftRecipeTable.json$": {
+		"transform": {
+			"type": "flatc",
+			"schema": "../src/asset/CraftRecipeTable.fbs"
+		}
+	},
+	"MachineTable.json$": {
+		"transform": {
+			"type": "flatc",
+			"schema": "../src/asset/MachineTable.fbs"
 		}
 	},
 	"ItemTable.json$": {
 		"transform": {
 			"type": "flatc",
-			"schema": "../src/ItemTable.fbs"
+			"schema": "../src/asset/ItemTable.fbs"
 		}
 	}
 }

@@ -1,0 +1,20 @@
+namespace asset.fbs;
+
+table CraftRecipeItem {
+	quantity: short;
+	item_id: int;
+}
+
+table CraftRecipe {
+  id: int;
+  label: string;
+  duration: int;
+  input: [CraftRecipeItem];
+  output: [CraftRecipeItem];
+}
+
+table CraftRecipeTable {
+  recipes: [CraftRecipe];
+}
+
+root_type CraftRecipeTable;

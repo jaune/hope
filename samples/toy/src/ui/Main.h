@@ -4,6 +4,7 @@
 #include "./Canvas.h"
 
 #include "./StorageList.h"
+#include "./MachinePanel.h"
 
 namespace ui {
 	using namespace hope::ui;
@@ -41,11 +42,18 @@ namespace ui {
 				if (props.selected_entity_id != 0)
 				{
 					if (Entities::testComponentMask(props.selected_entity_id, StorageComponent::COMPONENT_MASK)){
-
 						ui::StorageList::Props sl_p;
 						sl_p.storage_id = props.selected_entity_id;
 
 						auto rq = c->appendChild< StorageList >(main_id, sl_p);
+					}
+					else if (Entities::testComponentMask(props.selected_entity_id, MachineComponent::COMPONENT_MASK)) {
+						
+						ui::MachinePanel::Props mp_p;
+						mp_p.machine_id = props.selected_entity_id;
+
+						auto rq = c->appendChild< MachinePanel >(main_id, mp_p);
+
 					}
 
 				}
