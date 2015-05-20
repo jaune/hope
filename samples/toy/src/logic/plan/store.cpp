@@ -4,8 +4,8 @@
 #include <console.h>
 
 #include "../../systems/action/GoToAdjacent.h"
-#include "../../systems/action/ItemPick.h"
-#include "../../systems/action/ItemGive.h"
+#include "../../systems/action/MachineOutputPick.h"
+#include "../../systems/action/ItemBagGive.h"
 
 namespace logic {
 	namespace plan {
@@ -52,13 +52,13 @@ namespace logic {
 					systems::action::GoToAdjacent.attachTo(agent_id, machine_id);
 					break;
 				case 1:
-					logic::action::machine::output::pick.attach(agent_id, item_id, machine_id);
+					systems::action::MachineOutputPick.attachTo(agent_id, item_id, machine_id);
 					break;
 				case 2:
 					systems::action::GoToAdjacent.attachTo(agent_id, storage_id);
 					break;
 				case 3: {
-					systems::action::ItemGive.attachTo(agent_id, item_id, storage_id);
+					systems::action::ItemBagGive.attachTo(agent_id, item_id, storage_id);
 					break;
 				}
 				default:

@@ -3,10 +3,10 @@
 
 #include "./action/GoToAdjacent.h"
 #include "./action/Extract.h"
-#include "./action/ItemPick.h"
-#include "./action/ItemGive.h"
+#include "./action/ItemBagPick.h"
+#include "./action/ItemBagGive.h"
 #include "./action/Construct.h"
-
+#include "./action/MachineOutputPick.h"
 
 class ActionSystem {
 public:
@@ -42,16 +42,18 @@ namespace systems {
 		inline void process() {
 			systems::action::GoToAdjacent.process();
 			systems::action::Extract.process();
-			systems::action::ItemPick.process();
-			systems::action::ItemGive.process();
+			systems::action::ItemBagPick.process();
+			systems::action::ItemBagGive.process();
+			systems::action::MachineOutputPick.process();
 			systems::action::Construct.process();
 		}
 
 		inline void cleanup() {
 			systems::action::GoToAdjacent.cleanup();
 			systems::action::Extract.cleanup();
-			systems::action::ItemPick.cleanup();
-			systems::action::ItemGive.cleanup();
+			systems::action::ItemBagPick.cleanup();
+			systems::action::ItemBagGive.cleanup();
+			systems::action::MachineOutputPick.cleanup();
 			systems::action::Construct.cleanup();
 
 			instance.cleanup();

@@ -5,7 +5,7 @@
 
 #include "../../systems/action/GoToAdjacent.h"
 #include "../../systems/action/Extract.h"
-#include "../../systems/action/ItemGive.h"
+#include "../../systems/action/ItemBagGive.h"
 
 namespace logic {
 	namespace plan {
@@ -57,7 +57,7 @@ namespace logic {
 					break;
 				case 3: {
 					auto deposit_c = Components::get<DepositComponent>(deposit_id);
-					systems::action::ItemGive.attachTo(agent_id, deposit_c->item_id, storage_id);
+					systems::action::ItemBagGive.attachTo(agent_id, deposit_c->item_id, storage_id);
 					break;
 				}
 				default:

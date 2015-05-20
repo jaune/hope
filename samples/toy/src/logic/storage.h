@@ -43,7 +43,7 @@ namespace storage {
 		}
 	}
 
-	bool tryAssignBestRequestMachine(EntityId storage_id, EntityId agent_id){
+	bool tryAssignStore(EntityId storage_id, EntityId agent_id){
 		auto bag_c = Components::get<ItemBagComponent>(storage_id);
 		auto storage_c = Components::get<StorageComponent>(storage_id);
 
@@ -51,19 +51,23 @@ namespace storage {
 		
 		findInArea(storage_id, MachineComponent::COMPONENT_MASK, candidates);
 
+		
+
 		for (auto it = candidates.begin(); it != candidates.end(); ++it) {
 			auto machine_c = Components::get<MachineComponent>(*it);
 			if (machine_c->output.getTotalQuantity() > 0) {
 				for (auto item : machine_c->output.items) {
-					plan::store::assign(agent_id, storage_id, *it, item.first);
-				}
-				return true;
+					if (storage_c->request_quantities.getItemQuantity(item.first) > bag_c->items.getItemQuantity(item.first)) {
+						plan::store::assign(agent_id, storage_id, *it, item.first);
+						return true;
+					}
+				}				
 			}
 		}
 		return false;
 	}
 
-	EntityId tryAssignBestRequestDeposit(EntityId storage_id, EntityId agent_id) {
+	EntityId tryAssignExtract(EntityId storage_id, EntityId agent_id) {
 		auto storage_c = Components::get<StorageComponent>(storage_id);
 		auto bag_c = Components::get<ItemBagComponent>(storage_id);
 

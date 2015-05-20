@@ -167,11 +167,11 @@ public:
 					bool is_assigned = false;
 
 					if (!is_assigned) {
-						is_assigned = logic::storage::tryAssignBestRequestMachine(storage_id, agent_id);
+						is_assigned = logic::storage::tryAssignStore(storage_id, agent_id);
 					}
 					
 					if (!is_assigned) {
-						is_assigned = logic::storage::tryAssignBestRequestDeposit(storage_id, agent_id);
+						is_assigned = logic::storage::tryAssignExtract(storage_id, agent_id);
 					}
 				}
 			}

@@ -52,19 +52,19 @@
 
         'src/systems/Action.h',
         'src/systems/action/AbstractActionSystem.h',
-        'src/systems/action/ItemPick.h',
-        'src/systems/action/ItemPick.cpp',
-        'src/systems/action/ItemGive.h',
-        'src/systems/action/ItemGive.cpp',
+        'src/systems/action/ItemBagPick.h',
+        'src/systems/action/ItemBagPick.cpp',
+        'src/systems/action/ItemBagGive.h',
+        'src/systems/action/ItemBagGive.cpp',
         'src/systems/action/Construct.h',
         'src/systems/action/Construct.cpp',
         'src/systems/action/Extract.h',
         'src/systems/action/Extract.cpp',
         'src/systems/action/GoToAdjacent.h',
         'src/systems/action/GoToAdjacent.cpp',
-
-
-        
+        'src/systems/action/MachineOutputPick.h',
+        'src/systems/action/MachineOutputPick.cpp',
+      
 
 
         'src/task/Task.h',

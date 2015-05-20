@@ -224,7 +224,7 @@ struct ExtractActionComponent {
 	DepositLevel from_level;
 };
 
-struct ItemPickActionComponent {
+struct ItemBagPickActionComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 17);
 
 	ItemId item_id;
@@ -237,12 +237,15 @@ struct ConstructActionComponent {
 	EntityId task_id;
 };
 
-struct ItemGiveActionComponent {
+struct ItemBagGiveActionComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 19);
 
 	ItemId item_id;
 	EntityId to_id;
 };
+
+
+
 
 struct ExtractTaskComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 20);
@@ -269,13 +272,19 @@ struct MachineComponent {
 	ItemQuantity output_max;
 };
 
+
 struct TileIndexComponent{
 	static const ComponentMask COMPONENT_MASK = (1 << 22);
 
 	TileIndex index;
 };
 
+struct MachineOutputPickActionComponent{
+	static const ComponentMask COMPONENT_MASK = (1 << 23);
 
+	ItemId item_id;
+	EntityId from_id;
+};
 
 #define REGISTER_COMPONENT(COMPONENT_CLASS) \
 private: \
@@ -339,8 +348,9 @@ public:
 	REGISTER_COMPONENT(GoToAdjacentActionComponent)
 	REGISTER_COMPONENT(ExtractActionComponent)
 	REGISTER_COMPONENT(ConstructActionComponent)
-	REGISTER_COMPONENT(ItemPickActionComponent)
-	REGISTER_COMPONENT(ItemGiveActionComponent)
+	REGISTER_COMPONENT(ItemBagPickActionComponent)
+	REGISTER_COMPONENT(ItemBagGiveActionComponent)
+	REGISTER_COMPONENT(MachineOutputPickActionComponent)
 
 	REGISTER_COMPONENT(MachineComponent)
 	REGISTER_COMPONENT(TileIndexComponent)

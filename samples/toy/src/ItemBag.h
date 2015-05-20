@@ -41,11 +41,22 @@ public:
 	void setItemQuantity(ItemId id, ItemQuantity q){
 		auto it = items.find(id);
 
+		if (q < 0) {
+			q = 0;
+		}
+
 		if (it == items.end()) {
-			items.insert(Map::value_type(id, q));
+			if (q > 0) {
+				items.insert(Map::value_type(id, q));
+			}
 		}
 		else {
-			it->second = q;
+			if (q > 0) {
+				it->second = q;
+			}
+			else {
+				items.erase(it);
+			}			
 		}
 	}
 

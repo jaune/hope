@@ -1,14 +1,14 @@
-#include "./ItemPick.h"
+#include "./ItemBagPick.h"
 
-ItemPickActionSystem::ItemPickActionSystem() :
-	processComponent_callback(std::bind(&ItemPickActionSystem::processComponent, this, std::placeholders::_1, std::placeholders::_2)) {
+ItemBagPickActionSystem::ItemBagPickActionSystem() :
+	processComponent_callback(std::bind(&ItemBagPickActionSystem::processComponent, this, std::placeholders::_1, std::placeholders::_2)) {
 }
 
-void ItemPickActionSystem::process() {
-	Components::foreach<ItemPickActionComponent>(processComponent_callback);
+void ItemBagPickActionSystem::process() {
+	Components::foreach<ItemBagPickActionComponent>(processComponent_callback);
 }
 
-void ItemPickActionSystem::processComponent(ItemPickActionComponent* dataItemTransfert, EntityId to_id) {
+void ItemBagPickActionSystem::processComponent(ItemBagPickActionComponent* dataItemTransfert, EntityId to_id) {
 	auto dataAction = Components::get<ActionComponent>(to_id);
 
 	ItemId item_id = dataItemTransfert->item_id;
@@ -28,9 +28,9 @@ void ItemPickActionSystem::processComponent(ItemPickActionComponent* dataItemTra
 	dataAction->status = ActionComponent::Status::SUCCESS;
 }
 
-void ItemPickActionSystem::attachTo(EntityId agent_id, ItemId item_id, EntityId to_id) {
+void ItemBagPickActionSystem::attachTo(EntityId agent_id, ItemId item_id, EntityId to_id) {
 	Components::attach<ActionComponent>(agent_id);
-	auto Action = Components::attach<ItemPickActionComponent>(agent_id);
+	auto Action = Components::attach<ItemBagPickActionComponent>(agent_id);
 
 	Action->item_id = item_id;
 	Action->from_id = to_id;

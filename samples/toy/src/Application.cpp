@@ -72,9 +72,10 @@ ComponentManager<ExtractTaskComponent> Components::manager_ExtractTaskComponent;
 ComponentManager<ActionComponent> Components::manager_ActionComponent;
 ComponentManager<GoToAdjacentActionComponent> Components::manager_GoToAdjacentActionComponent;
 ComponentManager<ExtractActionComponent> Components::manager_ExtractActionComponent;
-ComponentManager<ItemPickActionComponent> Components::manager_ItemPickActionComponent;
+ComponentManager<ItemBagPickActionComponent> Components::manager_ItemBagPickActionComponent;
 ComponentManager<ConstructActionComponent> Components::manager_ConstructActionComponent;
-ComponentManager<ItemGiveActionComponent> Components::manager_ItemGiveActionComponent;
+ComponentManager<ItemBagGiveActionComponent> Components::manager_ItemBagGiveActionComponent;
+ComponentManager<MachineOutputPickActionComponent> Components::manager_MachineOutputPickActionComponent;
 
 ComponentManager<MachineComponent> Components::manager_MachineComponent;
 ComponentManager<TileIndexComponent> Components::manager_TileIndexComponent;

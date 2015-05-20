@@ -6,8 +6,8 @@
 #include "../../Entities.h"
 
 #include "../../systems/action/GoToAdjacent.h"
-#include "../../systems/action/ItemPick.h"
-#include "../../systems/action/ItemGive.h"
+#include "../../systems/action/ItemBagPick.h"
+#include "../../systems/action/ItemBagGive.h"
 
 namespace task {
 
@@ -39,13 +39,13 @@ namespace task {
 					systems::action::GoToAdjacent.attachTo(agent_id, ItemTransfert->from_id);
 					break;
 				case 1:
-					systems::action::ItemPick.attachTo(agent_id, ItemTransfert->item_id, ItemTransfert->from_id);
+					systems::action::ItemBagPick.attachTo(agent_id, ItemTransfert->item_id, ItemTransfert->from_id);
 					break;
 				case 2:
 					systems::action::GoToAdjacent.attachTo(agent_id, ItemTransfert->to_id);
 					break;
 				case 3:
-					systems::action::ItemGive.attachTo(agent_id, ItemTransfert->item_id, ItemTransfert->to_id);
+					systems::action::ItemBagGive.attachTo(agent_id, ItemTransfert->item_id, ItemTransfert->to_id);
 					break;
 				default:
 					hope::console::log("MISSING STEP %s: %d", __FILE__, __LINE__);
