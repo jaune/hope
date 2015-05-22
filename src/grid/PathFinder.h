@@ -49,20 +49,20 @@ namespace hope {
 			IsOpenCallback callback;
 
 		private:
-			int32_t computeCost(const Location& current, const Location& next) {
+			inline int32_t computeCost(const Location& current, const Location& next) const {
 				return 1;
 			}
 
-			int32_t computeHeuristic(const Location& current, const Location& goal){
+			inline int32_t computeHeuristic(const Location& current, const Location& goal) const {
 				return 10 * (abs(current.x - goal.x) + abs(current.y - goal.y));
 			}
 
-			bool isOpen(const Location& location) const {
+			inline bool isOpen(const Location& location) const {
 				return callback(location);
 			}
 
 		public:
-			
+
 
 			PathFinder(const hope::grid::AABox& bounds, IsOpenCallback callback) :
 				callback(callback),
@@ -78,10 +78,15 @@ namespace hope {
 			Location goal;
 
 			PathCrawler* reconstructPath(const Location& start, const Location& goal) const {
+				if (came_from.find(goal) == came_from.end()){
+					return NULL;
+				}
+
 				PathCrawler* crawler = new PathCrawler(callback);
 
 				Location current = goal;
 				crawler->push(current);
+
 				while (current != start) {
 					current = came_from.at(current);
 					crawler->push(current);
@@ -108,7 +113,7 @@ namespace hope {
 				}
 			}
 
-			
+
 
 			PathCrawler* find(const Location& start, const Location& goal) {
 				frontier.push(start, 0);
@@ -148,7 +153,7 @@ namespace hope {
 			int32_t computeHeuristic(const Location& current, const Location& goal){
 				return 10 * (abs(current.x - goal.x) + abs(current.y - goal.y));
 			}
-			
+
 			bool isOpen(const Location& location) const {
 				return callback(location);
 			}
@@ -179,12 +184,12 @@ namespace hope {
 					delete crawler;
 					return NULL;
 				}
-				
+
 				return crawler;
 			}
 
 			PathCrawler* find(const Location& start, const Location& goal) {
-				
+
 				PriorityQueue<Location> frontier;
 
 				frontier.push(start, 0);
@@ -222,7 +227,7 @@ namespace hope {
 		class PathFinder_mine_v1 {
 
 		public:
-			
+
 
 		private:
 
@@ -427,10 +432,10 @@ namespace hope {
 			}
 		};
 
-		
 
 
-} /* namespace grid */
+
+	} /* namespace grid */
 } /* namespace hope */
 
 #endif /* HOPE_GRID_PATHFINDER_H */

@@ -15,6 +15,12 @@ namespace agent {
 		Components::attach<AgentComponent>(id)->label = label;
 		Components::attach<LaborComponent>(id)->labor = 1000;
 
+		auto actor = Components::attach<ActorComponent>(id);
+
+		logic::action::Idle::Options options;
+
+		actor->action = logic::action::create(options);
+
 		Components::attach<TileIndexComponent>(id)->index = 253;
 
 		return id;

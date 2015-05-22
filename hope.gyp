@@ -43,6 +43,9 @@
         'src/grid/PathCrawler.h',
         'src/grid/FloodFillQuery.h',
 
+        'src/grid/NavigationGrid.h',
+        'src/grid/NavigationGrid.cpp',
+
         'src/ai/need.h',
         'src/ai/Agent.h',
         'src/ai/System.h',
@@ -51,6 +54,10 @@
         'src/ai/plan/Step.h',
         'src/ai/plan/StepTable.h',
         'src/ai/plan/StepTable.cpp',
+
+
+        'src/profile.h',
+        'src/profile.cpp',
       ],
     },
   ],

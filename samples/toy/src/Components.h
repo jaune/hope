@@ -129,14 +129,6 @@ struct PlanComponent {
 
 	typedef int16_t StepIndex;
 
-	enum Status {
-		NONE = 0,
-		IN_PROGRESS,
-		FAILURE,
-		SUCCESS
-	};
-
-	Status status;
 	StepIndex step;
 	StepIndex size;
 	EntityId task_id;
@@ -159,7 +151,7 @@ struct LaborComponent {
 };
 
 
-typedef int32_t DepositLevel;
+
 
 struct DepositComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 13);
@@ -185,7 +177,47 @@ struct DepositComponent {
 };
 
 
+struct ExtractTaskComponent {
+	static const ComponentMask COMPONENT_MASK = (1 << 20);
 
+	ItemId item_id;
+	EntityId to_id;
+	EntityId from_id;
+	DepositLevel from_level;
+};
+
+
+struct MachineComponent {
+	static const ComponentMask COMPONENT_MASK = (1 << 21);
+
+	MachineType type;
+	CraftRecipeId recipe_id;
+
+	CraftDuration duration;
+	ItemBag input;
+	ItemBag inner;
+	ItemBag output;
+
+	ItemQuantity input_max;
+	ItemQuantity output_max;
+};
+
+
+struct TileIndexComponent{
+	static const ComponentMask COMPONENT_MASK = (1 << 22);
+
+	TileIndex index;
+};
+
+#include "./logic/action.h"
+
+struct ActorComponent {
+	static const ComponentMask COMPONENT_MASK = (1 << 30);
+
+	logic::action::Action action;
+};
+
+/*
 
 struct ActionComponent {
 	static const ComponentMask COMPONENT_MASK = (1 << 14);
@@ -246,45 +278,14 @@ struct ItemBagGiveActionComponent {
 
 
 
-
-struct ExtractTaskComponent {
-	static const ComponentMask COMPONENT_MASK = (1 << 20);
-
-	ItemId item_id;
-	EntityId to_id;
-	EntityId from_id;
-	DepositLevel from_level;
-};
-
-
-struct MachineComponent {
-	static const ComponentMask COMPONENT_MASK = (1 << 21);
-
-	MachineType type;
-	CraftRecipeId recipe_id;
-
-	CraftDuration duration;
-	ItemBag input;
-	ItemBag inner;
-	ItemBag output;
-
-	ItemQuantity input_max;
-	ItemQuantity output_max;
-};
-
-
-struct TileIndexComponent{
-	static const ComponentMask COMPONENT_MASK = (1 << 22);
-
-	TileIndex index;
-};
-
 struct MachineOutputPickActionComponent{
 	static const ComponentMask COMPONENT_MASK = (1 << 23);
 
 	ItemId item_id;
 	EntityId from_id;
 };
+
+*/
 
 #define REGISTER_COMPONENT(COMPONENT_CLASS) \
 private: \
@@ -342,8 +343,10 @@ public:
 	REGISTER_COMPONENT(ItemTransfertTaskComponent)
 	REGISTER_COMPONENT(ConstructTaskComponent)
 	REGISTER_COMPONENT(ExtractTaskComponent)
+
+	REGISTER_COMPONENT(ActorComponent)
 	
-	
+/*
 	REGISTER_COMPONENT(ActionComponent)
 	REGISTER_COMPONENT(GoToAdjacentActionComponent)
 	REGISTER_COMPONENT(ExtractActionComponent)
@@ -351,6 +354,7 @@ public:
 	REGISTER_COMPONENT(ItemBagPickActionComponent)
 	REGISTER_COMPONENT(ItemBagGiveActionComponent)
 	REGISTER_COMPONENT(MachineOutputPickActionComponent)
+*/
 
 	REGISTER_COMPONENT(MachineComponent)
 	REGISTER_COMPONENT(TileIndexComponent)

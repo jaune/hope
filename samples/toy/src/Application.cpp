@@ -35,7 +35,6 @@
 
 #include "./Entities.h"
 #include "./task/Task.h"
-#include "./systems/Action.h"
 #include "./task/Construction.h"
 
 #include "./logic/deposit.h"
@@ -68,17 +67,10 @@ ComponentManager<ItemTransfertTaskComponent> Components::manager_ItemTransfertTa
 ComponentManager<ConstructTaskComponent> Components::manager_ConstructTaskComponent;
 ComponentManager<ExtractTaskComponent> Components::manager_ExtractTaskComponent;
 
-
-ComponentManager<ActionComponent> Components::manager_ActionComponent;
-ComponentManager<GoToAdjacentActionComponent> Components::manager_GoToAdjacentActionComponent;
-ComponentManager<ExtractActionComponent> Components::manager_ExtractActionComponent;
-ComponentManager<ItemBagPickActionComponent> Components::manager_ItemBagPickActionComponent;
-ComponentManager<ConstructActionComponent> Components::manager_ConstructActionComponent;
-ComponentManager<ItemBagGiveActionComponent> Components::manager_ItemBagGiveActionComponent;
-ComponentManager<MachineOutputPickActionComponent> Components::manager_MachineOutputPickActionComponent;
-
 ComponentManager<MachineComponent> Components::manager_MachineComponent;
 ComponentManager<TileIndexComponent> Components::manager_TileIndexComponent;
+
+ComponentManager<ActorComponent> Components::manager_ActorComponent;
 
 
 static hope::ai::plan::NeedType N_SLEEP;
@@ -1114,19 +1106,28 @@ void notifyGrid(const ::hope::input::mouse::MouseState& mouseState) {
 
 #include "./logic/plan.h"
 
+#include "profile.h";
+
 void simulate(){
+	static uint32_t trun = 0;
 
-	systems::Task.updatePlan();
-
-	systems::Action::cleanup();
-
-	systems::Task.assignTaskToLazy();
-
-	logic::plan::attachAction();
-
-	systems::Action::process();
-
+	hope::profile::begin();
+	
+	logic::action::process();
+	
+	logic::plan::step();
+	
+	logic::action::idle();
+		
 	logic::machine::craft();
+
+	auto t = hope::profile::end();
+	if (t > 10000000) {
+		hope::console::log("========== turn %d ==========", trun);
+		hope::profile::log();
+		hope::console::log("======================");
+	}
+	trun++;
 }
 
 void Application::onLoop(void) {
@@ -1163,7 +1164,6 @@ void Application::onLoop(void) {
 
 	while (kAccuTime > 30) {
 		simulate();
-
 
 		kAccuTime = 0;
 	}

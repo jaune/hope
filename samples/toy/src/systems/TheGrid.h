@@ -15,7 +15,7 @@
 #include "../CellType.h"
 #include "../systems/TheGrid.h"
 
-#include "../NavigationGrid.h"
+#include <grid/NavigationGrid.h>
 
 #include "../Components.h"
 
@@ -56,7 +56,7 @@ struct TheGridSystem {
 	ToyGrid* kToyGrid;
 	RoomGrid* kRoomGrid;
 	ItemGrid* kItemGrid;
-	NavigationGrid* navigation;
+	hope::grid::NavigationGrid* navigation;
 
 
 	bool needUpdateNavigationGroups;
@@ -64,8 +64,6 @@ struct TheGridSystem {
 	hope::grid::IsOpenCallback isCellOpenCallback;
 
 	TheGridSystem();
-
-	bool isCellOpen(const hope::grid::Location& location) const;
 
 	void setWall(int32_t x, int32_t y);
 
@@ -82,11 +80,12 @@ struct TheGridSystem {
 
 	void initialize(size_t w, size_t h);
 
-	NavigationGroup getNavigationGroup(const hope::grid::Location& location) const;
+	hope::grid::NavigationGroup getNavigationGroup(const hope::grid::Location& location) const;
 
 	hope::grid::PathCrawler* findShortestPathToAdjacent(const hope::grid::Location& from_location, EntityId to_id) const;
-
 	hope::grid::PathCrawler* findShortestPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location) const;
+	hope::grid::PathCrawler* findShortestPathToAdjacent(EntityId from_id, EntityId to_id) const;
+	
 };
 
 

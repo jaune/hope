@@ -2,32 +2,13 @@
 #include <grid/Location.h>
 
 TheGridSystem::TheGridSystem() :
-needUpdateNavigationGroups(false),
-isCellOpenCallback(std::bind(&TheGridSystem::isCellOpen, this, std::placeholders::_1)) {
-}
-
-bool TheGridSystem::isCellOpen(const hope::grid::Location& location) const {
-	CellType type = kToyGrid->at(location)->type;
-
-	if (type == FLOOR || type == VOID) {
-		return true;
-	}
-	else if (type == DOOR) {
-		const DoorCell* cell = kDoorGrid->find(location);
-
-		if (cell != NULL) {
-			return !cell->isLocked;
-		}
-		return true;
-	}
-
-	return false;
+needUpdateNavigationGroups(false) {
 }
 
 void TheGridSystem::setWall(int32_t x, int32_t y) {
 	kToyGrid->at(x, y)->type = CellType::WALL;
 	kRoomGrid->setToDefault(x, y);
-	navigation->setToDefault(x, y);
+	navigation->setWalkable(x, y, false);
 }
 
 void TheGridSystem::setDestroy(int32_t x, int32_t y) {
@@ -35,8 +16,6 @@ void TheGridSystem::setDestroy(int32_t x, int32_t y) {
 
 void TheGridSystem::setFloor(int32_t x, int32_t y) {
 	kToyGrid->at(x, y)->type = CellType::FLOOR;
-
-
 }
 
 void TheGridSystem::setRoom(int32_t x, int32_t y, int32_t w, int32_t h) {
@@ -53,6 +32,7 @@ void TheGridSystem::setDoor(int32_t x, int32_t y, bool isLocked, bool isClose){
 
 	kDoorGrid->set(x, y, doorCell);
 	kToyGrid->at(x, y)->type = CellType::DOOR;
+	navigation->setWalkable(x, y, true);
 }
 
 void TheGridSystem::updateNavigationGroups(){
@@ -84,7 +64,7 @@ void TheGridSystem::initialize(size_t w, size_t h) {
 
 	kItemGrid = new ItemGrid(w, h);
 
-	navigation = new NavigationGrid(w, h, isCellOpenCallback);
+	navigation = new hope::grid::NavigationGrid(w, h);
 
 	kDoorGrid = new DoorGrid(w, h);
 
@@ -92,11 +72,16 @@ void TheGridSystem::initialize(size_t w, size_t h) {
 
 
 
-NavigationGroup TheGridSystem::getNavigationGroup(const hope::grid::Location& location) const {
+hope::grid::NavigationGroup TheGridSystem::getNavigationGroup(const hope::grid::Location& location) const {
 	return navigation->findGroup(location);
 }
 
+#include <profile.h>
+
+
 hope::grid::PathCrawler* TheGridSystem::findShortestPathToAdjacent(const hope::grid::Location& from_location, EntityId to_id) const {
+	hope::profile::begin(__FUNCTION__);
+
 	auto dataLocation = Components::get<LocationComponent>(to_id);
 
 	hope::grid::Location neighbors[4];
@@ -123,28 +108,20 @@ hope::grid::PathCrawler* TheGridSystem::findShortestPathToAdjacent(const hope::g
 			}
 		}
 	}
+
+	hope::profile::end();
 	return shortestPath;
 }
 
 hope::grid::PathCrawler* TheGridSystem::findShortestPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location) const {
-	if (!isCellOpen(from_location)) {
-		return NULL;
-	}
-	if (!isCellOpen(to_location)) {
-		return NULL;
-	}
-
-	if (getNavigationGroup(from_location) != getNavigationGroup(to_location)){
-		return NULL;
-	}
-
-
-	hope::grid::PathFinder pf(bounds, isCellOpenCallback);
-
-	return pf.find(from_location, to_location);
+	return navigation->findPath(from_location, to_location);
 }
 
+hope::grid::PathCrawler* TheGridSystem::findShortestPathToAdjacent(EntityId from_id, EntityId to_id) const {
+	auto dataLocation = Components::get<LocationComponent>(from_id);
 
+	return findShortestPathToAdjacent(dataLocation->position, to_id);
+}
 
 namespace systems {
 

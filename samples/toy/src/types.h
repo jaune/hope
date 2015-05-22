@@ -19,4 +19,8 @@ typedef uint16_t MachineType;
 typedef uint16_t CraftRecipeId;
 typedef uint16_t CraftDuration;
 
+typedef int32_t DepositLevel;
+
+typedef uint16_t PathId;
+
 #endif /* HOPE_SAMPLES_TOY_types_H */

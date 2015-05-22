@@ -10,12 +10,12 @@
 #include <unordered_map>
 
 namespace hope {
-namespace grid {
+	namespace grid {
 
-	typedef std::function<void(int32_t, int32_t)> Callback;
-	typedef std::function<bool(const Location&)> IsOpenCallback;
+		typedef std::function<void(int32_t, int32_t)> Callback;
+		typedef std::function<bool(const Location&)> IsOpenCallback;
 
-	
+
 		struct AABox {
 			int32_t xMax;
 			int32_t yMax;
@@ -47,10 +47,10 @@ namespace grid {
 				return (location.x <= xMax) && (location.x >= xMin) && (location.y <= yMax) && (location.y >= yMin);
 			}
 
-			void addLocation(const Location& location ){
+			void addLocation(const Location& location){
 				xMin = (location.x < xMin) ? location.x : xMin;
 				yMin = (location.y < yMin) ? location.y : yMin;
-				
+
 				xMax = (location.x > xMax) ? location.x : xMax;
 				yMax = (location.y > yMax) ? location.y : yMax;
 			}
@@ -64,7 +64,7 @@ namespace grid {
 				yMin = (a < b) ? a : b;
 				yMax = (a > b) ? a : b;
 			}
-			
+
 			inline int32_t width() const {
 				return xMax - xMin;
 			}
@@ -82,7 +82,7 @@ namespace grid {
 
 			size_t width;
 			size_t height;
-			AABox aabox;
+			AABox bounds;
 			Cell defaultCell;
 
 			typedef std::unordered_map<Location, Cell> CellMap;
@@ -94,11 +94,11 @@ namespace grid {
 				height(height),
 				defaultCell(defaultCell) {
 
-				aabox.yMin = 0;
-				aabox.xMin = 0;
+				bounds.yMin = 0;
+				bounds.xMin = 0;
 
-				aabox.yMax = height;
-				aabox.xMax = width;
+				bounds.yMax = height;
+				bounds.xMax = width;
 			}
 
 			size_t getWidth() const {
@@ -108,7 +108,7 @@ namespace grid {
 			size_t getHeight() const {
 				return height;
 			}
-			
+
 			void setAllToDefault() {
 				cells.clear();
 			}
@@ -140,7 +140,7 @@ namespace grid {
 				set(Location(x, y), cell);
 			}
 
-			
+
 
 			const Cell& get(const Location& location) const {
 				auto it = cells.find(location);
@@ -200,7 +200,7 @@ namespace grid {
 					aabox.xMin = aabox.xMax = location.x;
 					aabox.yMin = aabox.yMax = location.y;
 				}
-				else if(cells.size() > 0) {
+				else if (cells.size() > 0) {
 					aabox.addLocation(location);
 				}
 
@@ -263,7 +263,7 @@ namespace grid {
 		struct Grid {
 
 			typedef T Cell;
-						
+
 			Cell* cells;
 			size_t width;
 			size_t height;
@@ -302,6 +302,10 @@ namespace grid {
 				return cells + (x + (y * width));
 			}
 
+			inline Cell* at(const Location& l){
+				return cells + (l.x + (l.y * width));
+			}
+
 			inline const Cell* at(size_t x, size_t y) const {
 				return cells + (x + (y * width));
 			}
@@ -309,6 +313,7 @@ namespace grid {
 			inline const Cell* at(const Location& l) const {
 				return cells + (l.x + (l.y * width));
 			}
+
 
 			void queryFillRect(int32_t x, int32_t y, int32_t w, int32_t h, Callback callback) {
 				Cell* c;
@@ -344,7 +349,7 @@ namespace grid {
 				if (fw > 0 && fh > 0) {
 					queryFillRect(x + b, y + b, fw, fh, fillCallback);
 				}
-				
+
 			}
 		};
 
@@ -353,7 +358,7 @@ namespace grid {
 			bool isOpen;
 		};
 
-		struct IsOpenGrid : public Grid<IsOpenCell> {
+		struct IsOpenGrid : public Grid < IsOpenCell > {
 
 			IsOpenGrid(int32_t w, int32_t h) : Grid<IsOpenCell>(w, h) {
 				size_t index;
@@ -373,7 +378,7 @@ namespace grid {
 		};
 
 
-} /* namespace grid */
+	} /* namespace grid */
 } /* namespace hope */
 
 #endif /* HOPE_GRID_GRID_H */

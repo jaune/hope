@@ -2,6 +2,7 @@
 #define HOPE_SAMPLES_TOY_LOGIC_PLAN_EXTRACT_H
 
 #include "../../types.h"
+#include "./Status.h"
 
 namespace logic {
 	namespace plan {
@@ -16,7 +17,8 @@ namespace logic {
 
 			void assign(EntityId agent_id, EntityId storage_id, EntityId deposit_id);
 			void attachAction(EntityId agent_id);
-			void step(EntityId agent_id);
+
+			logic::plan::Status step(EntityId agent_id);
 		}
 	}
 }

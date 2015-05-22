@@ -1,7 +1,7 @@
 #ifndef HOPE_SAMPLES_TOY_logic_Location_H
 #define HOPE_SAMPLES_TOY_logic_Location_H
 
-#include <grid/Location.h>
+#include <grid/Grid.h>
 #include "../Components.h"
 
 namespace logic {

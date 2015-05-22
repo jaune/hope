@@ -17,6 +17,7 @@
       'sources': [
         'src/toy.cpp',
 
+
         'src/Application.h',
         'src/Application.cpp',
 
@@ -27,9 +28,10 @@
         'src/CellType.h',
         
 
-        'src/NavigationGrid.h',
+        
 
         'src/logic/storage.h',
+        'src/logic/storage.cpp',
         
         'src/logic/plan.h',
         'src/logic/plan.cpp',
@@ -43,6 +45,8 @@
         'src/logic/deposit.h',
         'src/logic/deposit.cpp',
 
+        'src/logic/path.h',
+
         'src/logic/location.h',
         'src/logic/location.cpp',
         
@@ -50,21 +54,36 @@
         'src/systems/TheGrid.h',
         'src/systems/TheGrid.cpp',
 
-        'src/systems/Action.h',
-        'src/systems/action/AbstractActionSystem.h',
-        'src/systems/action/ItemBagPick.h',
-        'src/systems/action/ItemBagPick.cpp',
-        'src/systems/action/ItemBagGive.h',
-        'src/systems/action/ItemBagGive.cpp',
-        'src/systems/action/Construct.h',
-        'src/systems/action/Construct.cpp',
-        'src/systems/action/Extract.h',
-        'src/systems/action/Extract.cpp',
-        'src/systems/action/GoToAdjacent.h',
-        'src/systems/action/GoToAdjacent.cpp',
-        'src/systems/action/MachineOutputPick.h',
-        'src/systems/action/MachineOutputPick.cpp',
-      
+        'src/logic/action.h',
+        'src/logic/action.cpp',
+        'src/logic/action/action.h',
+        'src/logic/action/functions_generated.h',
+        'src/logic/action/functions_generated.cpp',
+        'src/logic/action/options_generated.h',
+
+        'src/logic/action/Idle.h',
+        'src/logic/action/Idle.cpp',
+
+        'src/logic/action/GoToAdjacent.h',
+        'src/logic/action/GoToAdjacent.cpp',
+
+        'src/logic/action/machine/OutputPick.h',
+        'src/logic/action/machine/OutputPick.cpp',
+
+        'src/logic/action/deposit/Extract.h',
+        'src/logic/action/deposit/Extract.cpp',
+
+        'src/logic/action/construction/Construct.h',
+        'src/logic/action/construction/Construct.cpp',
+
+        'src/logic/action/itembag/Give.h',
+        'src/logic/action/itembag/Give.cpp',
+
+        'src/logic/action/itembag/Pick.h',
+        'src/logic/action/itembag/Pick.cpp',
+
+
+          
 
 
         'src/task/Task.h',
