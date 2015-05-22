@@ -3,6 +3,8 @@
 
 #include <grid/Grid.h>
 #include <grid/PathCrawler.h>
+#include <grid/PathFinder.h>
+
 
 namespace hope {
 	namespace grid {
@@ -25,12 +27,13 @@ namespace hope {
 		class NavigationGrid : public hope::grid::Grid< NavigationCell > {
 			int32_t group_total;
 			hope::grid::IsOpenCallback callback;
+			hope::grid::PathFinder pathfinder;
 
 		public:
 			NavigationGrid(size_t width, size_t height);
 
 			bool validatePathCrawler(const hope::grid::PathCrawler& path) const;
-			hope::grid::PathCrawler* findPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location) const;
+			hope::grid::PathCrawler* findPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location);
 			void updateGroups();
 
 			void resetGroups();

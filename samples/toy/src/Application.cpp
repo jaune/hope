@@ -1111,7 +1111,7 @@ void notifyGrid(const ::hope::input::mouse::MouseState& mouseState) {
 void simulate(){
 	static uint32_t trun = 0;
 
-	hope::profile::begin();
+//	hope::profile::begin();
 	
 	logic::action::process();
 	
@@ -1121,12 +1121,14 @@ void simulate(){
 		
 	logic::machine::craft();
 
+	/*
 	auto t = hope::profile::end();
 	if (t > 10000000) {
 		hope::console::log("========== turn %d ==========", trun);
 		hope::profile::log();
 		hope::console::log("======================");
 	}
+*/
 	trun++;
 }
 

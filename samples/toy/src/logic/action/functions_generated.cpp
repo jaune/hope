@@ -1,5 +1,4 @@
 #include "./functions_generated.h"
-#include <profile.h>
 #include <cassert>
 
 namespace logic {
@@ -82,9 +81,7 @@ namespace logic {
 
 			switch (a.type) {
 			case GO_TO_ADJACENT:
-				hope::profile::begin("GoToAdjacent::process");
 				a.status = GoToAdjacent::process(actor_id, a.status, a.options.GO_TO_ADJACENT, a.state.GO_TO_ADJACENT);
-				hope::profile::end();
 				break;
 			case IDLE:
 				a.status = Idle::process(actor_id, a.options.IDLE, a.state.IDLE);

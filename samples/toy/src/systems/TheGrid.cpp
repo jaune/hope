@@ -76,12 +76,7 @@ hope::grid::NavigationGroup TheGridSystem::getNavigationGroup(const hope::grid::
 	return navigation->findGroup(location);
 }
 
-#include <profile.h>
-
-
 hope::grid::PathCrawler* TheGridSystem::findShortestPathToAdjacent(const hope::grid::Location& from_location, EntityId to_id) const {
-	hope::profile::begin(__FUNCTION__);
-
 	auto dataLocation = Components::get<LocationComponent>(to_id);
 
 	hope::grid::Location neighbors[4];
@@ -109,7 +104,6 @@ hope::grid::PathCrawler* TheGridSystem::findShortestPathToAdjacent(const hope::g
 		}
 	}
 
-	hope::profile::end();
 	return shortestPath;
 }
 

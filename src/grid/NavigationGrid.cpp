@@ -11,7 +11,8 @@ namespace hope {
 
 		NavigationGrid::NavigationGrid(size_t width, size_t height) :
 			hope::grid::Grid<NavigationCell>(width, height),
-			callback(std::bind(&NavigationGrid::isWalkable, this, std::placeholders::_1)) {
+			callback(std::bind(&NavigationGrid::isWalkable, this, std::placeholders::_1)),
+			pathfinder(aabox, callback) {
 
 			resetWalkable();
 			resetGroups();
@@ -20,11 +21,10 @@ namespace hope {
 		bool NavigationGrid::validatePathCrawler(const hope::grid::PathCrawler& path) const {
 			return path.isValid();
 		}
+
 		
-		hope::grid::PathCrawler* NavigationGrid::findPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location) const {
-
-			hope::profile::begin(__FUNCTION__);
-
+		
+		hope::grid::PathCrawler* NavigationGrid::findPath(const hope::grid::Location& from_location, const hope::grid::Location& to_location) {
 			if (!isWalkable(from_location)) {
 				return NULL;
 			}
@@ -35,12 +35,8 @@ namespace hope {
 			if (findGroup(from_location) != findGroup(to_location)){
 				return NULL;
 			}
-
-			hope::grid::PathFinder pf(aabox, callback);
-
-			auto r = pf.find(from_location, to_location);
-
-			hope::profile::end();
+			
+			auto r = pathfinder.find(from_location, to_location);
 
 			return r;
 		}

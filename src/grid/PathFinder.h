@@ -29,6 +29,10 @@ struct PriorityQueue {
 		elements.emplace(priority, item);
 	}
 
+	inline void clear() {
+		elements = std::priority_queue < PQElement, std::vector<PQElement>, Greater >();
+	}
+
 	inline T pop() {
 		T best_item = elements.top().second;
 		elements.pop();
@@ -43,13 +47,27 @@ namespace hope {
 
 		class PathFinder {
 		public:
+
+			typedef int32_t Cost;
+			typedef int32_t Index;
+
+		public:
 			hope::grid::AABox bounds;
 
 		private:
+			PriorityQueue<Location> frontier;
+			Location goal;
+
 			IsOpenCallback callback;
 
+			bool* came_from_alive;
+			Location* came_from_location;
+
+			bool* cost_so_far_alive;
+			Cost* cost_so_far_value;
+
 		private:
-			inline int32_t computeCost(const Location& current, const Location& next) const {
+			inline Cost computeCost(const Location& current, const Location& next) const {
 				return 1;
 			}
 
@@ -61,24 +79,48 @@ namespace hope {
 				return callback(location);
 			}
 
-		public:
-
-
-			PathFinder(const hope::grid::AABox& bounds, IsOpenCallback callback) :
-				callback(callback),
-				bounds(bounds) {
+			inline Index index(const Location& location) const {
+				return location.x + (location.y * bounds.width());
 			}
 
-			~PathFinder() {
+			// ------------
+
+			inline void setCostSoFar(const Location& location, Cost cost) {
+				const Index i = index(location);
+
+				cost_so_far_alive[i] = true;
+				cost_so_far_value[i] = cost;
 			}
 
-			std::unordered_map<Location, Location> came_from;
-			std::unordered_map<Location, int> cost_so_far;
-			PriorityQueue<Location> frontier;
-			Location goal;
+			inline bool hasCostSoFar(const Location& location) const {
+				return cost_so_far_alive[index(location)];
+			}
+
+			inline const Cost getCostSoFar(const Location& location) const {
+				return cost_so_far_value[index(location)];
+			}
+
+			// ------------
+
+			inline void setCameFrom(const Location& location, const Location& from) {
+				const Index i = index(location);
+
+				came_from_alive[i] = true;
+				came_from_location[i] = from;
+			}
+
+			inline bool hasCameFrom(const Location& location) const {
+				return came_from_alive[index(location)];
+			}
+
+			inline const Location& getCameFrom(const Location& location) const {
+				return came_from_location[index(location)];
+			}
+
+			// ------------
 
 			PathCrawler* reconstructPath(const Location& start, const Location& goal) const {
-				if (came_from.find(goal) == came_from.end()){
+				if (!hasCameFrom(goal)) {
 					return NULL;
 				}
 
@@ -88,7 +130,7 @@ namespace hope {
 				crawler->push(current);
 
 				while (current != start) {
-					current = came_from.at(current);
+					current = getCameFrom(current);
 					crawler->push(current);
 				}
 
@@ -102,20 +144,50 @@ namespace hope {
 
 			void processNeighbor(const Location& current, const Location& next) {
 				if (isOpen(next) && bounds.contains(next)) {
-					int new_cost = cost_so_far[current] + computeCost(current, next);
+					Cost new_cost = getCostSoFar(current) + computeCost(current, next);
 
-					if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
-						cost_so_far[next] = new_cost;
+					if (!hasCostSoFar(next) || new_cost < getCostSoFar(next)) {
+						setCostSoFar(next, new_cost);
 						int priority = new_cost + computeHeuristic(next, goal);
 						frontier.push(next, priority);
-						came_from[next] = current;
+						setCameFrom(next, current);
 					}
 				}
 			}
 
 
 
+		public:
+			PathFinder(const hope::grid::AABox& bounds, IsOpenCallback callback) :
+				callback(callback),
+				bounds(bounds) {
+
+				Index length = bounds.width() * bounds.height();
+
+				came_from_alive = new bool[length];
+				came_from_location = new Location[length];
+
+				cost_so_far_alive = new bool[length];
+				cost_so_far_value = new Cost[length];
+			}			
+
+			~PathFinder() {
+				delete[] came_from_alive;
+				delete[] came_from_location;
+
+				delete[] cost_so_far_alive;
+				delete[] cost_so_far_value;
+			}
+			
 			PathCrawler* find(const Location& start, const Location& goal) {
+				Index length = bounds.width() * bounds.height();
+
+				for (Index i = 0; i < length; ++i) {
+					came_from_alive[i] = false;
+					cost_so_far_alive[i] = false;
+				}
+				frontier.clear();
+
 				frontier.push(start, 0);
 				this->goal = goal;
 
@@ -135,304 +207,6 @@ namespace hope {
 				return reconstructPath(start, goal);
 			}
 		};
-
-
-
-		class PathFinder_blob_v1 {
-		public:
-			hope::grid::AABox bounds;
-
-		private:
-			IsOpenCallback callback;
-
-		private:
-			int32_t computeCost(const Location& current, const Location& next) {
-				return 1;
-			}
-
-			int32_t computeHeuristic(const Location& current, const Location& goal){
-				return 10 * (abs(current.x - goal.x) + abs(current.y - goal.y));
-			}
-
-			bool isOpen(const Location& location) const {
-				return callback(location);
-			}
-
-		public:
-			PathFinder_blob_v1(const hope::grid::AABox& bounds, IsOpenCallback callback) :
-				callback(callback),
-				bounds(bounds) {
-			}
-
-			~PathFinder_blob_v1(){
-			}
-
-			std::unordered_map<Location, Location> came_from;
-			std::unordered_map<Location, int> cost_so_far;
-
-			PathCrawler* reconstructPath(const Location& start, const Location& goal) const {
-				PathCrawler* crawler = new PathCrawler(callback);
-
-				Location current = goal;
-				crawler->push(current);
-				while (current != start) {
-					current = came_from.at(current);
-					crawler->push(current);
-				}
-
-				if (crawler->length() == 0) {
-					delete crawler;
-					return NULL;
-				}
-
-				return crawler;
-			}
-
-			PathCrawler* find(const Location& start, const Location& goal) {
-
-				PriorityQueue<Location> frontier;
-
-				frontier.push(start, 0);
-
-				Location Neighbors[4];
-
-				while (!frontier.empty()) {
-					auto current = frontier.pop();
-
-					if (current == goal) {
-						break;
-					}
-
-					current.get4Neighbors(Neighbors);
-
-					for (auto next : Neighbors) {
-						if (isOpen(next) && bounds.contains(next)) {
-							int new_cost = cost_so_far[current] + computeCost(current, next);
-
-							if (!cost_so_far.count(next) || new_cost < cost_so_far[next]) {
-								cost_so_far[next] = new_cost;
-								int priority = new_cost + computeHeuristic(next, goal);
-								frontier.push(next, priority);
-								came_from[next] = current;
-							}
-						}
-					}
-				}
-
-				return reconstructPath(start, goal);
-			}
-		};
-
-
-		class PathFinder_mine_v1 {
-
-		public:
-
-
-		private:
-
-			struct Node {
-				int32_t x;
-				int32_t y;
-				bool isOpen;
-				bool isClose;
-				Node* parent;
-
-				int32_t g, f, h;
-
-				Node() : g(0), f(0), h(0), isOpen(false), isClose(false), parent(NULL), x(0), y(0) {
-				}
-
-				Node(int32_t x, int32_t y) : g(0), f(0), h(0), isOpen(false), isClose(false), parent(NULL), x(x), y(y) {
-				}
-
-				Node(const Location& key) : g(0), f(0), h(0), isOpen(false), isClose(false), parent(NULL), x(key.x), y(key.y) {
-				}
-
-				Node(int32_t x, int32_t y, int32_t h) : g(0), f(0), h(h), isOpen(false), isClose(false), parent(NULL), x(x), y(y) {
-				}
-
-				Node(const Location& key, int32_t h) : g(0), f(0), h(h), isOpen(false), isClose(false), parent(NULL), x(key.x), y(key.y) {
-				}
-
-				void setGScore(int32_t newG) {
-					g = newG;
-					f = h + newG;
-				};
-			};
-
-			struct CompareNodeF {
-				bool operator() (Node* a, Node* b) {
-					return a->f > b->f;
-				}
-			} compareNodeF;
-
-			typedef std::unordered_map<Location, Node*> NodeMap;
-
-			NodeMap nodes;
-			std::vector<Node*> heap;
-
-			Location end;
-
-			IsOpenCallback callback;
-
-			inline bool isHeapEmpty() const {
-				return heap.empty();
-			}
-
-			void sortHeap() {
-				std::sort(heap.begin(), heap.end(), compareNodeF);
-			}
-
-			void pushNode(Node* node) {
-				heap.push_back(node);
-			}
-
-			Node* popNode() {
-				Node* back = heap.back();
-				heap.pop_back();
-
-				return back;
-			}
-
-			Node* getNode(const Location& key) {
-				auto it = nodes.find(key);
-
-				if (it == nodes.end()) {
-					int32_t h = 10 * (abs(key.x - end.x) + abs(key.y - end.y));
-
-					Node* node = new Node(key, h);
-
-					nodes.insert(NodeMap::value_type(key, node));
-
-					return node;
-				}
-
-				return it->second;
-			}
-
-			bool hasNode(const Location& key) {
-				return nodes.find(key) != nodes.end();
-			}
-
-			bool inCloseList(const Location& key) {
-				return hasNode(key) && getNode(key)->isClose;
-			}
-
-			void processNeighbour(Node* currentNode, const Location& key) {
-				if (!bounds.contains(key)) {
-					return;
-				}
-
-				int32_t neighbourG = currentNode->g + 10;
-
-				if (isOpen(key) && !inCloseList(key)) {
-					Node* neighbour = getNode(key);
-					if (!neighbour->isOpen) {
-						neighbour->isOpen = true;
-						neighbour->parent = currentNode;
-						neighbour->setGScore(neighbourG);
-						pushNode(neighbour);
-						sortHeap();
-					}
-					else {
-						if (neighbour->g < neighbourG) {
-							neighbour->parent = currentNode;
-							neighbour->setGScore(neighbourG);
-							sortHeap();
-						}
-					}
-				}
-			}
-
-			PathCrawler* createCrawler(Node* current) {
-				Location v;
-				Node* n = current;
-
-				PathCrawler* crawler = new PathCrawler(callback);
-
-				while (n) {
-					v.set(n->x, n->y);
-					crawler->push(v);
-					n = n->parent;
-				}
-
-				return crawler;
-			}
-
-			void clearup() {
-				for (auto it = nodes.begin(); it != nodes.end(); ++it) {
-					delete it->second;
-				}
-				nodes.clear();
-			}
-
-			bool isOpen(const Location& location) const {
-				return callback(location);
-			}
-
-			hope::grid::AABox bounds;
-
-		public:
-			PathFinder_mine_v1(const hope::grid::AABox& bounds, IsOpenCallback callback) :
-				callback(callback),
-				bounds(bounds) {
-			}
-
-			~PathFinder_mine_v1(){
-				clearup();
-			}
-
-			PathCrawler* find(const Location& start, int32_t endX, int32_t endY) {
-				return find(start.x, start.y, endX, endY);
-			}
-
-			PathCrawler* find(const Location& start, const Location& end) {
-				return find(start.x, start.y, end.x, end.y);
-			}
-
-			PathCrawler* find(int32_t startX, int32_t startY, int32_t endX, int32_t endY) {
-				end.set(endX, endY);
-
-				Location key;
-				int32_t iteration = 0;
-				Node* current;
-
-				key.set(startX, startY);
-				Node* startNode = new Node(key);
-				nodes.insert(NodeMap::value_type(key, startNode));
-				pushNode(startNode);
-
-				while (!isHeapEmpty() && (iteration < 5000)) {
-					current = popNode();
-
-					if ((current->x == endX) && (current->y == endY)) {
-						PathCrawler* crawler = createCrawler(current);
-						return crawler;
-					}
-
-					current->isOpen = false;
-					current->isClose = true;
-
-					key.set(current->x, current->y + 1);
-					processNeighbour(current, key);
-
-					key.set(current->x + 1, current->y);
-					processNeighbour(current, key);
-
-					key.set(current->x, current->y - 1);
-					processNeighbour(current, key);
-
-					key.set(current->x - 1, current->y);
-					processNeighbour(current, key);
-
-					iteration++;
-				}
-				return NULL;
-			}
-		};
-
-
 
 
 	} /* namespace grid */
